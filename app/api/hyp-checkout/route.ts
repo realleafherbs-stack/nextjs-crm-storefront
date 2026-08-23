@@ -81,9 +81,14 @@ export async function POST(req: NextRequest) {
   const products = await getProducts();
   const priceById = new Map(products.map((p) => [p.id, p.price]));
   const nameById = new Map(products.map((p) => [p.id, p.name]));
+  // gtin carries the real Payper SKU for CRM-synced products (see
+  // lib/products.ts) — passed through as variantId, the field name the
+  // CRM's invoice-generation code (lib/payper.ts) already reads to populate
+  // Payper's catalog_id on each invoice line.
+  const skuById = new Map(products.map((p) => [p.id, p.gtin]));
 
   let subtotal = 0;
-  const orderItems: { id: string; name: string; price: number; qty: number }[] = [];
+  const orderItems: { id: string; name: string; price: number; qty: number; variantId?: string }[] = [];
   for (const item of items) {
     const price = priceById.get(item.id);
     if (price === undefined) {
@@ -94,7 +99,8 @@ export async function POST(req: NextRequest) {
     }
     const qty = Math.max(1, Math.floor(item.qty));
     subtotal += price * qty;
-    orderItems.push({ id: item.id, name: nameById.get(item.id) ?? item.id, price, qty });
+    const sku = skuById.get(item.id);
+    orderItems.push({ id: item.id, name: nameById.get(item.id) ?? item.id, price, qty, ...(sku ? { variantId: sku } : {}) });
   }
 
   let discount = 0;

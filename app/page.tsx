@@ -71,7 +71,7 @@ export default async function HomePage() {
           <section className="brand-story section" id="one-pro">
             <div className="shell brand-story__grid">
               <div className="brand-story__image brand-story__product">
-                <img src={featured.images[1] ?? featured.image} loading="lazy" decoding="async" alt="HTC One Pro בזווית מוצר מקצועית" />
+                <img src="/assets/higgs/at-799-angle.jpg" loading="lazy" decoding="async" alt="HTC One Pro בזווית מוצר מקצועית" />
                 <span>ONE PRO<br />PROFESSIONAL</span>
               </div>
               <div className="brand-story__copy">
