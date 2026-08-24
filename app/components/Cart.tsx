@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart, FREE_SHIPPING_THRESHOLD } from "../context/CartContext";
+import { formatPrice } from "../../lib/constants";
 
 export default function Cart() {
   const { items, total, count, isPanelOpen, closePanel, removeItem, updateQuantity } = useCart();
@@ -38,7 +39,7 @@ export default function Cart() {
                 <div className="cart-item__content">
                   <span>HTC ישראל · יבואן רשמי</span>
                   <h3>{item.name}</h3>
-                  <small>₪{item.price}</small>
+                  <small>₪{formatPrice(item.price)}</small>
                   <div className="cart-item__quantity">
                     <button aria-label="הפחתת כמות" onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
                     <b>{item.quantity}</b>
@@ -54,12 +55,12 @@ export default function Cart() {
         </div>
         <div className="cart__foot" hidden={items.length === 0}>
           <div className="shipping-progress">
-            <p>{remaining ? <>נשארו <b>₪{remaining}</b> למשלוח חינם</> : <b>הרווחתם משלוח חינם</b>}</p>
+            <p>{remaining ? <>נשארו <b>₪{formatPrice(remaining)}</b> למשלוח חינם</> : <b>הרווחתם משלוח חינם</b>}</p>
             <i><span style={{ width: `${percent}%` }}></span></i>
           </div>
           <div>
             <span>סה״כ</span>
-            <b>₪{total}</b>
+            <b>₪{formatPrice(total)}</b>
           </div>
           <button type="button" onClick={() => { closePanel(); router.push("/cart"); }}>
             להמשך ההזמנה <span>←</span>

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "../../context/CartContext";
+import { formatPrice } from "../../../lib/constants";
 
 export default function SuccessClient({ orderId, amount }: { orderId: string; amount: string }) {
   const { clearCart } = useCart();
@@ -33,7 +34,7 @@ export default function SuccessClient({ orderId, amount }: { orderId: string; am
       {(orderId || amount) && (
         <div className="payment-result__summary">
           {orderId && <div><span>מספר הזמנה</span><b>{orderId}</b></div>}
-          {amount && <div><span>סכום שחויב</span><b>₪{amount}</b></div>}
+          {amount && <div><span>סכום שחויב</span><b>₪{formatPrice(Number(amount))}</b></div>}
         </div>
       )}
       <div className="payment-result__actions">

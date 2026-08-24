@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCart } from "../context/CartContext";
 import { productContent } from "../../lib/product-content";
 import type { StoreProduct } from "../../lib/products-data";
+import { formatPrice } from "../../lib/constants";
 
 export default function ProductCard({ product, featured = false }: { product: StoreProduct; featured?: boolean }) {
   const { addItem } = useCart();
@@ -29,15 +30,15 @@ export default function ProductCard({ product, featured = false }: { product: St
             <>
               <div className="price-offer__top"><span>מחיר השקה</span><b>{discount}% הנחה</b></div>
               <div className="price-offer__main">
-                <strong><sup>₪</sup>{product.price}</strong>
-                <div><del>₪{compareAtPrice}</del><small>חיסכון של ₪{savings}</small></div>
+                <strong><sup>₪</sup>{formatPrice(product.price)}</strong>
+                <div><del>₪{formatPrice(compareAtPrice)}</del><small>חיסכון של ₪{formatPrice(savings)}</small></div>
               </div>
               <p>כולל מע״מ</p>
             </>
           ) : (
             <>
               <span>מחיר השקה</span>
-              <strong>₪{product.price}</strong>
+              <strong>₪{formatPrice(product.price)}</strong>
             </>
           )}
         </div>

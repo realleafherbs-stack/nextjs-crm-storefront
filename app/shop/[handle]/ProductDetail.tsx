@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useCart } from "../../context/CartContext";
 import { WARRANTY_FAQ_ANSWER, type ProductContent } from "../../../lib/product-content";
 import type { StoreProduct } from "../../../lib/products-data";
-import { FREE_SHIPPING_THRESHOLD } from "../../../lib/constants";
+import { FREE_SHIPPING_THRESHOLD, formatPrice } from "../../../lib/constants";
 
 const noteIcons = [
   <svg key="0" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 17h6"/></svg>,
@@ -89,9 +89,9 @@ export default function ProductDetail({
           <div className="product-hold">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
             <span className="product-price-offer">
-              <small>מחיר השקה · <del>₪{content.compareAtPrice}</del></small>
-              <strong>₪{product.price}</strong>
-              <em>חיסכון ₪{savings}</em>
+              <small>מחיר השקה · <del>₪{formatPrice(content.compareAtPrice)}</del></small>
+              <strong>₪{formatPrice(product.price)}</strong>
+              <em>חיסכון ₪{formatPrice(savings)}</em>
               <p>המחיר כולל מע״מ · משלוח חינם בקנייה מעל ₪{FREE_SHIPPING_THRESHOLD}</p>
             </span>
           </div>
@@ -240,7 +240,7 @@ export default function ProductDetail({
       </section>
 
       <div className="mobile-buy-bar" aria-label="רכישה מהירה">
-        <div><small>במלאי · <span>₪{product.price}</span></small><strong>{product.name}</strong></div>
+        <div><small>במלאי · <span>₪{formatPrice(product.price)}</span></small><strong>{product.name}</strong></div>
         <button type="button" onClick={handleMobileAdd}>
           <span>{mobileAdded ? "נוסף לסל ✓" : "הוספה לסל"}</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>

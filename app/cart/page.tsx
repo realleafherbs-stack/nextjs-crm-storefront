@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart, FREE_SHIPPING_THRESHOLD } from "../context/CartContext";
+import { formatPrice } from "../../lib/constants";
 
 export default function CartPage() {
   const { items, total, removeItem, updateQuantity } = useCart();
@@ -33,7 +34,7 @@ export default function CartPage() {
                     <div className="cart-item__content">
                       <span>HTC ישראל · יבואן רשמי</span>
                       <h3>{item.name}</h3>
-                      <small>₪{item.price}</small>
+                      <small>₪{formatPrice(item.price)}</small>
                       <div className="cart-item__quantity">
                         <button aria-label="הפחתת כמות" onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
                         <b>{item.quantity}</b>
@@ -48,9 +49,9 @@ export default function CartPage() {
               </div>
               <aside className="cart-page__summary">
                 <h2>סיכום הזמנה</h2>
-                <div className="cart-page__summary-row"><span>סכום ביניים</span><span>₪{total}</span></div>
-                <div className="cart-page__summary-row"><span>משלוח</span><span>{shipping === 0 ? "חינם" : `₪${shipping}`}</span></div>
-                <div className="cart-page__summary-row cart-page__summary-row--total"><span>סה״כ</span><span>₪{total + shipping}</span></div>
+                <div className="cart-page__summary-row"><span>סכום ביניים</span><span>₪{formatPrice(total)}</span></div>
+                <div className="cart-page__summary-row"><span>משלוח</span><span>{shipping === 0 ? "חינם" : `₪${formatPrice(shipping)}`}</span></div>
+                <div className="cart-page__summary-row cart-page__summary-row--total"><span>סה״כ</span><span>₪{formatPrice(total + shipping)}</span></div>
                 <button className="button button--gold" type="button" onClick={() => router.push("/checkout")}>
                   להמשך לתשלום <span>←</span>
                 </button>

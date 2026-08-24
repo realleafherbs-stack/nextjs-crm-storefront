@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart, FREE_SHIPPING_THRESHOLD } from "../context/CartContext";
+import { formatPrice } from "../../lib/constants";
 
 type Step = "shipping" | "payment";
 
@@ -226,15 +227,15 @@ export default function CheckoutPage() {
               {items.map((item) => (
                 <div className="cart-page__summary-row" key={item.id}>
                   <span>{item.name} × {item.quantity}</span>
-                  <span>₪{item.price * item.quantity}</span>
+                  <span>₪{formatPrice(item.price * item.quantity)}</span>
                 </div>
               ))}
-              <div className="cart-page__summary-row"><span>סכום ביניים</span><span>₪{total}</span></div>
+              <div className="cart-page__summary-row"><span>סכום ביניים</span><span>₪{formatPrice(total)}</span></div>
               {discount > 0 && (
-                <div className="cart-page__summary-row"><span>הנחה ({appliedCoupon?.code})</span><span>-₪{discount}</span></div>
+                <div className="cart-page__summary-row"><span>הנחה ({appliedCoupon?.code})</span><span>-₪{formatPrice(discount)}</span></div>
               )}
-              <div className="cart-page__summary-row"><span>משלוח</span><span>{shipping === 0 ? "חינם" : `₪${shipping}`}</span></div>
-              <div className="cart-page__summary-row cart-page__summary-row--total"><span>סה״כ</span><span>₪{finalTotal}</span></div>
+              <div className="cart-page__summary-row"><span>משלוח</span><span>{shipping === 0 ? "חינם" : `₪${formatPrice(shipping)}`}</span></div>
+              <div className="cart-page__summary-row cart-page__summary-row--total"><span>סה״כ</span><span>₪{formatPrice(finalTotal)}</span></div>
 
               {appliedCoupon ? (
                 <p style={{ fontSize: "13px", color: "#347247" }}>✓ קוד {appliedCoupon.code} הוחל</p>
