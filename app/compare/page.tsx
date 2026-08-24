@@ -4,11 +4,19 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import CompareClient from "./CompareClient";
 import { getProducts } from "../../lib/products";
+import { getContent, c } from "../../lib/content";
 
-export const metadata: Metadata = {
-  title: "השוואת דגמים | HTC ישראל",
-  description: "השוו בין מכונות התספורת, הטרימרים והמגלחים של HTC ישראל ובחרו את הדגם המדויק לצורך שלכם.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getContent();
+  const title = c(content, "compare.seo_title", "השוואת דגמים | HTC ישראל");
+  const description = c(content, "compare.seo_description", "השוו בין מכונות התספורת, הטרימרים והמגלחים של HTC ישראל ובחרו את הדגם המדויק לצורך שלכם.");
+  const ogImage = content["compare.seo_og_image"];
+  return {
+    title,
+    description,
+    ...(ogImage ? { openGraph: { title, description, images: [{ url: ogImage }] } } : {}),
+  };
+}
 
 export default async function ComparePage() {
   const products = await getProducts();

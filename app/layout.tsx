@@ -9,16 +9,29 @@ import AccessibilityWidget from "./components/AccessibilityWidget";
 import CookieConsent from "./components/CookieConsent";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ScrollReveal from "./components/ScrollReveal";
+import { getSiteSeo } from "../lib/seo";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3004"),
-  title: "HTC ישראל | מכונות תספורת וגילוח",
-  description: "HTC ישראל — מכונות תספורת, טרימרים ומכונות גילוח עם אחריות ושירות בישראל.",
-  manifest: "/site.webmanifest",
-  icons: {
-    icon: "/assets/brand/htc-logo-black.png",
-  },
-};
+const defaultTitle = "HTC ישראל | מכונות תספורת וגילוח";
+const defaultDescription = "HTC ישראל — מכונות תספורת, טרימרים ומכונות גילוח עם אחריות ושירות בישראל.";
+
+// CRM-editable (Settings → SEO → Site-wide) when set, otherwise the
+// hardcoded defaults above so the site never ships blank meta tags.
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getSiteSeo();
+  const title = seo.metaTitle || defaultTitle;
+  const description = seo.metaDescription || defaultDescription;
+
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3004"),
+    title,
+    description,
+    manifest: "/site.webmanifest",
+    icons: {
+      icon: "/assets/brand/htc-logo-black.png",
+    },
+    ...(seo.ogImage ? { openGraph: { title, description, images: [{ url: seo.ogImage }] } } : {}),
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

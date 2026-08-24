@@ -5,11 +5,19 @@ import Footer from "../components/Footer";
 import UtilityBar from "../components/UtilityBar";
 import ShopGrid from "./ShopGrid";
 import { getProducts, getCategories } from "../../lib/products";
+import { getContent, c } from "../../lib/content";
 
-export const metadata: Metadata = {
-  title: "החנות | HTC ישראל",
-  description: "חנות HTC ישראל — כל מכונות התספורת, הטרימרים ומכונות הגילוח.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getContent();
+  const title = c(content, "shop.seo_title", "החנות | HTC ישראל");
+  const description = c(content, "shop.seo_description", "חנות HTC ישראל — כל מכונות התספורת, הטרימרים ומכונות הגילוח.");
+  const ogImage = content["shop.seo_og_image"];
+  return {
+    title,
+    description,
+    ...(ogImage ? { openGraph: { title, description, images: [{ url: ogImage }] } } : {}),
+  };
+}
 
 export default async function ShopPage() {
   const [products, categories] = await Promise.all([getProducts(), getCategories()]);

@@ -1,13 +1,29 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import UtilityBar from "./components/UtilityBar";
 import ProductCard from "./components/ProductCard";
 import { getProducts } from "../lib/products";
+import { getContent, c } from "../lib/content";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getContent();
+  const title = c(content, "homepage.seo_title", "HTC ישראל | מכונות תספורת וגילוח");
+  const description = c(content, "homepage.seo_description", "HTC ישראל — מכונות תספורת, טרימרים ומכונות גילוח עם אחריות ושירות בישראל.");
+  const ogImage = content["homepage.seo_og_image"];
+  return {
+    title,
+    description,
+    ...(ogImage ? { openGraph: { title, description, images: [{ url: ogImage }] } } : {}),
+  };
+}
 
 export default async function HomePage() {
-  const products = await getProducts();
+  const [products, content] = await Promise.all([getProducts(), getContent()]);
   const featured = products.find((p) => p.handle === "at-799") ?? products[0];
+  const heroHeading = content["homepage.hero_heading"];
+  const heroSubheading = content["homepage.hero_subheading"];
 
   return (
     <>
@@ -19,8 +35,8 @@ export default async function HomePage() {
           <div className="shell hero__grid">
             <div className="hero__copy">
               <p className="kicker">HTC</p>
-              <h1>מכונות תספורת וגילוח<br /><em>שנבנו לביצועים</em></h1>
-              <p className="hero__lead"><strong>תוצאה חדה ומדויקת.</strong><br />ביצועים מקצועיים עם אחריות בישראל.</p>
+              <h1>{heroHeading ? <span>{heroHeading}</span> : <>מכונות תספורת וגילוח<br /><em>שנבנו לביצועים</em></>}</h1>
+              <p className="hero__lead">{heroSubheading ? <span>{heroSubheading}</span> : <><strong>תוצאה חדה ומדויקת.</strong><br />ביצועים מקצועיים עם אחריות בישראל.</>}</p>
               <div className="hero__actions">
                 <a className="button button--gold" href="#products">לכל הדגמים <span>←</span></a>
                 <Link className="button button--ghost" href="/compare">השוואת דגמים</Link>

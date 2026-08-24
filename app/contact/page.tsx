@@ -3,21 +3,30 @@ import InnerHeader from "../components/InnerHeader";
 import InnerFooter from "../components/InnerFooter";
 import ContactForm from "./ContactForm";
 import { WhatsAppContactLink } from "../components/WhatsAppButton";
+import { getContent, c } from "../../lib/content";
 
-export const metadata: Metadata = {
-  title: "יצירת קשר | HTC ישראל",
-  description: "יצירת קשר עם HTC ישראל לייעוץ לפני רכישה, שירות, אחריות ומשלוחים.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getContent();
+  const title = c(content, "contact.seo_title", "יצירת קשר | HTC ישראל");
+  const description = c(content, "contact.seo_description", "יצירת קשר עם HTC ישראל לייעוץ לפני רכישה, שירות, אחריות ומשלוחים.");
+  const ogImage = content["contact.seo_og_image"];
+  return {
+    title,
+    description,
+    ...(ogImage ? { openGraph: { title, description, images: [{ url: ogImage }] } } : {}),
+  };
+}
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const content = await getContent();
   return (
     <>
       <InnerHeader />
       <section className="inner-hero inner-hero--contact">
         <div className="shell">
           <p>HTC ISRAEL</p>
-          <h1>דברו איתנו</h1>
-          <span>רכישה, שירות ואחריות</span>
+          <h1>{c(content, "contact.hero_heading", "דברו איתנו")}</h1>
+          <span>{c(content, "contact.hero_subheading", "רכישה, שירות ואחריות")}</span>
         </div>
       </section>
       <main className="contact-page shell" id="main">
