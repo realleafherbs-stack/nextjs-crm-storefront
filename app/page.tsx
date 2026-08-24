@@ -24,13 +24,17 @@ export default async function HomePage() {
   const featured = products.find((p) => p.handle === "at-799") ?? products[0];
   const heroHeading = content["homepage.hero_heading"];
   const heroSubheading = content["homepage.hero_subheading"];
+  const heroImage = c(content, "homepage.hero_image", "/hero-home.jpg");
+  const mapImage = c(content, "homepage.map_image", "/assets-htc-global.jpg");
+  const storyImage = c(content, "homepage.story_image", "/assets/higgs/at-799-angle.jpg");
+  const serviceImage = c(content, "homepage.service_image", "/service-barbershop.jpg");
 
   return (
     <>
       <UtilityBar />
       <Navbar />
       <main id="main">
-        <section className="hero">
+        <section className="hero" style={{ backgroundImage: `url(${heroImage})` }}>
           <div className="hero__texture"></div>
           <div className="shell hero__grid">
             <div className="hero__copy">
@@ -59,7 +63,7 @@ export default async function HomePage() {
         <section className="global-band" id="about">
           <div className="shell global-band__grid">
             <div className="global-band__map">
-              <img src="/assets-htc-global.jpg" loading="lazy" decoding="async" alt="HTC מותג בינלאומי — מפת פעילות עולמית" />
+              <img src={mapImage} loading="lazy" decoding="async" alt="HTC מותג בינלאומי — מפת פעילות עולמית" />
             </div>
             <div className="global-band__copy">
               <p className="kicker">מותג בינלאומי. עכשיו גם בישראל.</p>
@@ -87,7 +91,7 @@ export default async function HomePage() {
           <section className="brand-story section" id="one-pro">
             <div className="shell brand-story__grid">
               <div className="brand-story__image brand-story__product">
-                <img src="/assets/higgs/at-799-angle.jpg" loading="lazy" decoding="async" alt="HTC One Pro בזווית מוצר מקצועית" />
+                <img src={storyImage} loading="lazy" decoding="async" alt="HTC One Pro בזווית מוצר מקצועית" />
                 <span>ONE PRO<br />PROFESSIONAL</span>
               </div>
               <div className="brand-story__copy">
@@ -130,7 +134,7 @@ export default async function HomePage() {
               <Link className="button button--gold" href="/contact">דברו איתנו</Link>
             </div>
             <div className="service__photo">
-              <img src="/service-barbershop.jpg" loading="lazy" decoding="async" alt="עמדת ברברשופ מקצועית עם מגוון מכונות HTC" />
+              <img src={serviceImage} loading="lazy" decoding="async" alt="עמדת ברברשופ מקצועית עם מגוון מכונות HTC" />
             </div>
           </div>
         </section>
