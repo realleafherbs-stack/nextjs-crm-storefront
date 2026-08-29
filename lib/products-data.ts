@@ -12,6 +12,7 @@ export interface StoreProduct {
   category: (typeof categories)[number];
   categoryOrder: number;
   gtin: string;
+  stock?: number;
 }
 
 const [clipper, trimmer, shaver] = categories;

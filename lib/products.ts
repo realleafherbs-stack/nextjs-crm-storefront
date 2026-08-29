@@ -17,6 +17,15 @@ interface CrmProduct {
   categoryOrder?: number;
   gtin?: string | null;
   payperSku?: string | null;
+  stockQuantity?: number | null;
+}
+
+// A product Payper doesn't actively track has no stockQuantity at all — treat
+// a genuinely missing count as available rather than showing it as sold out.
+// Mirrors nic-pouch-store-main's lib/catalog/crm-adapter.mjs exactly.
+function resolveStock(stockQuantity: number | null | undefined): number {
+  if (stockQuantity == null) return 999;
+  return Math.max(0, Math.trunc(stockQuantity));
 }
 
 export async function getProducts(): Promise<StoreProduct[]> {
@@ -41,6 +50,7 @@ export async function getProducts(): Promise<StoreProduct[]> {
       // data — CRM never sets gtin for Payper-synced products, only
       // payperSku (same barcode number), so fall back to that.
       gtin: p.gtin ?? p.payperSku ?? "",
+      stock: resolveStock(p.stockQuantity),
     }));
   } catch {
     return fallbackProducts;

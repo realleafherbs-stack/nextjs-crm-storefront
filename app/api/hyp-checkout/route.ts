@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
   const products = await getProducts();
   const priceById = new Map(products.map((p) => [p.id, p.price]));
   const nameById = new Map(products.map((p) => [p.id, p.name]));
+  const stockById = new Map(products.map((p) => [p.id, p.stock ?? 999]));
   // gtin carries the real Payper SKU for CRM-synced products (see
   // lib/products.ts) — passed through as variantId, the field name the
   // CRM's invoice-generation code (lib/payper.ts) already reads to populate
@@ -98,6 +99,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: `Invalid quantity for item: ${item.id}` }, { status: 400 });
     }
     const qty = Math.max(1, Math.floor(item.qty));
+    const stock = stockById.get(item.id) ?? 999;
+    if (qty > stock) {
+      return NextResponse.json({ error: `Insufficient stock: ${nameById.get(item.id) ?? item.id}` }, { status: 400 });
+    }
     subtotal += price * qty;
     const sku = skuById.get(item.id);
     orderItems.push({ id: item.id, name: nameById.get(item.id) ?? item.id, price, qty, ...(sku ? { variantId: sku } : {}) });

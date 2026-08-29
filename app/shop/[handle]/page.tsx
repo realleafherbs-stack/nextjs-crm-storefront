@@ -5,14 +5,14 @@ import Footer from "../../components/Footer";
 import UtilityBar from "../../components/UtilityBar";
 import ProductDetail from "./ProductDetail";
 import { getProducts, getProductByHandle } from "../../../lib/products";
-import { productContent } from "../../../lib/product-content";
+import { productContent, genericProductContent } from "../../../lib/product-content";
 
 export async function generateMetadata({ params }: { params: Promise<{ handle: string }> }): Promise<Metadata> {
   const { handle: rawHandle } = await params;
   const handle = decodeURIComponent(rawHandle);
   const product = await getProductByHandle(handle);
   if (!product) return {};
-  const content = productContent[product.gtin];
+  const content = productContent[product.gtin] ?? genericProductContent(product);
   return {
     title: `${product.name} | HTC ישראל`,
     description: content ? `${product.name} — ${content.subtitle}. ${content.description} אחריות ושירות בישראל.` : product.name,
@@ -24,8 +24,7 @@ export default async function ProductPage({ params }: { params: Promise<{ handle
   const handle = decodeURIComponent(rawHandle);
   const [product, allProducts] = await Promise.all([getProductByHandle(handle), getProducts()]);
   if (!product) notFound();
-  const content = productContent[product.gtin];
-  if (!content) notFound();
+  const content = productContent[product.gtin] ?? genericProductContent(product);
   const related = allProducts.filter((p) => p.handle !== handle).slice(0, 2);
 
   return (

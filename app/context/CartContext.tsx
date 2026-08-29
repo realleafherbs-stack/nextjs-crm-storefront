@@ -12,6 +12,7 @@ export interface CartItem {
   name: string;
   price: number;
   quantity: number;
+  stock?: number;
   image?: string;
 }
 
@@ -76,12 +77,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem: CartContextType["addItem"] = (item, quantity = 1) => {
     const amount = Math.max(1, Math.floor(quantity));
+    const cap = item.stock ?? Infinity;
     setItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
-        return prev.map((i) => (i.id === item.id ? { ...i, quantity: i.quantity + amount } : i));
+        return prev.map((i) => (i.id === item.id ? { ...i, quantity: Math.min(cap, i.quantity + amount) } : i));
       }
-      return [...prev, { ...item, quantity: amount }];
+      return [...prev, { ...item, quantity: Math.min(cap, amount) }];
     });
     setToast({ message: `נוסף לסל: ${item.name}`, actionLabel: "לצפייה בסל", onAction: openPanel });
   };
@@ -100,7 +102,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) return removeItem(id);
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity } : i)));
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, quantity: Math.min(quantity, i.stock ?? Infinity) } : i)));
   };
 
   const clearCart = () => {

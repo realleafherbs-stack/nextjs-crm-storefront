@@ -200,5 +200,32 @@ export const productContent: Record<string, ProductContent> = {
   },
 };
 
+// Safety net for a Payper-synced product that doesn't (yet) have a
+// hand-written entry above — without this, app/shop/[handle]/page.tsx would
+// 404 the entire product page rather than show a plainer-but-working one.
+// Built only from real CRM fields (name/cardFeatures/price), so it never
+// invents facts the product doesn't have.
+export function genericProductContent(product: {
+  name: string;
+  price: number;
+  cardFeatures: string[];
+}): ProductContent {
+  return {
+    subtitle: product.cardFeatures[0] ?? "",
+    description: product.cardFeatures.length ? `תכונות עיקריות: ${product.cardFeatures.join(", ")}.` : product.name,
+    compareAtPrice: product.price,
+    notes: product.cardFeatures,
+    specs: product.cardFeatures.map((feature, index) => [`תכונה ${index + 1}`, feature] as [string, string]),
+    boxContents: "תכולת האריזה בהתאם לסימון היצרן.",
+    powerInfo: "לפרטי טעינה ושימוש עיינו בהוראות היצרן המצורפות לאריזה.",
+    story: {
+      eyebrow: "HTC ישראל",
+      headline: product.name,
+      body: product.cardFeatures.length ? `תכונות עיקריות: ${product.cardFeatures.join(", ")}.` : product.name,
+      benefits: [],
+    },
+  };
+}
+
 export const WARRANTY_FAQ_ANSWER =
   "12 חודשי אחריות יבואן רשמי על פגמי ייצור, ממועד מסירת המוצר ובכפוף לתעודת האחריות. השירות ניתן בישראל דרך שירות הלקוחות.";

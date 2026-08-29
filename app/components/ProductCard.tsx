@@ -12,6 +12,8 @@ export default function ProductCard({ product, featured = false }: { product: St
   const compareAtPrice = content?.compareAtPrice;
   const discount = compareAtPrice ? Math.round(((compareAtPrice - product.price) / compareAtPrice) * 100) : 0;
   const savings = compareAtPrice ? compareAtPrice - product.price : 0;
+  const stock = product.stock ?? 999;
+  const inStock = stock > 0;
 
   return (
     <article className={`product-card${featured ? " product-card--feature" : ""}`} data-category={product.category.slug}>
@@ -44,13 +46,14 @@ export default function ProductCard({ product, featured = false }: { product: St
         </div>
         <p className="product-card__warranty">12 חודשי אחריות יבואן רשמי</p>
         <div className="product-card__bottom">
-          <b className="availability is-in-stock">במלאי</b>
+          <b className={`availability ${inStock ? "is-in-stock" : "is-out-of-stock"}`}>{inStock ? "במלאי" : "אזל מהמלאי"}</b>
           <button
             className="add-button"
             type="button"
-            onClick={() => addItem({ id: product.id, name: product.name, price: product.price, image: product.image })}
+            disabled={!inStock}
+            onClick={() => inStock && addItem({ id: product.id, name: product.name, price: product.price, image: product.image, stock })}
           >
-            הוספה לסל <span aria-hidden="true">+</span>
+            {inStock ? "הוספה לסל" : "אזל מהמלאי"} <span aria-hidden="true">+</span>
           </button>
           <Link className={`card-link${featured ? " card-link--gold" : ""}`} href={`/shop/${product.handle}`}>
             לפרטים

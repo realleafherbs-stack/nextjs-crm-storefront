@@ -31,9 +31,13 @@ export default function ProductDetail({
   const discount = Math.round(((content.compareAtPrice - product.price) / content.compareAtPrice) * 100);
   const savings = content.compareAtPrice - product.price;
   const isFlagship = product.handle === "at-799";
+  const stock = product.stock ?? 999;
+  const inStock = stock > 0;
 
-  const addToCart = () =>
-    addItem({ id: product.id, name: product.name, price: product.price, image: product.image }, quantity);
+  const addToCart = () => {
+    if (!inStock) return;
+    addItem({ id: product.id, name: product.name, price: product.price, image: product.image, stock }, quantity);
+  };
 
   const buyNow = () => {
     addToCart();
@@ -82,9 +86,9 @@ export default function ProductDetail({
             <span>ברקוד: {product.gtin}</span>
           </div>
           <p>{content.description}</p>
-          <div className="stock stock--available">
+          <div className={`stock ${inStock ? "stock--available" : "stock--empty"}`}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="10"/></svg>
-            <span><b>במלאי</b><small>מוכן למשלוח מהיר</small></span>
+            <span>{inStock ? <><b>במלאי</b><small>מוכן למשלוח מהיר</small></> : <b>אזל מהמלאי</b>}</span>
           </div>
           <div className="product-hold">
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
@@ -103,17 +107,17 @@ export default function ProductDetail({
             <div>
               <button type="button" aria-label="הפחתת כמות" disabled={quantity === 1} onClick={() => setQuantity((q) => Math.max(1, q - 1))}>−</button>
               <b>{quantity}</b>
-              <button type="button" aria-label="הגדלת כמות" onClick={() => setQuantity((q) => Math.min(10, q + 1))}>+</button>
+              <button type="button" aria-label="הגדלת כמות" disabled={quantity >= Math.min(10, stock)} onClick={() => setQuantity((q) => Math.min(10, stock, q + 1))}>+</button>
             </div>
           </div>
           <div className="product-actions-live">
-            <button className="product-add" type="button" onClick={addToCart}>
+            <button className="product-add" type="button" onClick={addToCart} disabled={!inStock}>
               <span className="product-add__icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
               </span>
-              <span>הוספה לסל</span>
+              <span>{inStock ? "הוספה לסל" : "אזל מהמלאי"}</span>
             </button>
-            <button className="buy-now" type="button" onClick={buyNow}>
+            <button className="buy-now" type="button" onClick={buyNow} disabled={!inStock}>
               <span>קנייה עכשיו</span>
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
             </button>
@@ -240,9 +244,9 @@ export default function ProductDetail({
       </section>
 
       <div className="mobile-buy-bar" aria-label="רכישה מהירה">
-        <div><small>במלאי · <span>₪{formatPrice(product.price)}</span></small><strong>{product.name}</strong></div>
-        <button type="button" onClick={handleMobileAdd}>
-          <span>{mobileAdded ? "נוסף לסל ✓" : "הוספה לסל"}</span>
+        <div><small>{inStock ? "במלאי" : "אזל מהמלאי"} · <span>₪{formatPrice(product.price)}</span></small><strong>{product.name}</strong></div>
+        <button type="button" onClick={handleMobileAdd} disabled={!inStock}>
+          <span>{!inStock ? "אזל מהמלאי" : mobileAdded ? "נוסף לסל ✓" : "הוספה לסל"}</span>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>
         </button>
       </div>
