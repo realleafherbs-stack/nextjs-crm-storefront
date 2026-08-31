@@ -35,6 +35,11 @@ interface CartContextType {
   isPanelOpen: boolean;
   openPanel: () => void;
   closePanel: () => void;
+  // Cart state loads from localStorage in an effect that runs after first
+  // mount — consumers that need to read items/total exactly once (e.g. the
+  // purchase analytics event) should wait for this, or they'll see an empty
+  // cart every time.
+  hydrated: boolean;
 }
 
 const CartContext = createContext<CartContextType | null>(null);
@@ -119,7 +124,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     <CartContext.Provider
       value={{
         items, addItem, removeItem, updateQuantity, clearCart, total, count,
-        toast, dismissToast, isPanelOpen, openPanel, closePanel,
+        toast, dismissToast, isPanelOpen, openPanel, closePanel, hydrated,
       }}
     >
       {children}

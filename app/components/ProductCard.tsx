@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { sendGTMEvent } from "@next/third-parties/google";
 import { useCart } from "../context/CartContext";
 import { productContent } from "../../lib/product-content";
 import type { StoreProduct } from "../../lib/products-data";
@@ -8,6 +9,32 @@ import { formatPrice } from "../../lib/constants";
 
 export default function ProductCard({ product, featured = false }: { product: StoreProduct; featured?: boolean }) {
   const { addItem } = useCart();
+
+  const addToCart = () => {
+    if (product.stock !== undefined && product.stock <= 0) return;
+    addItem({ id: product.id, name: product.name, price: product.price, image: product.image, stock: product.stock });
+
+    sendGTMEvent({ ecommerce: null });
+    sendGTMEvent({
+      event: "add_to_cart",
+      ecommerce: {
+        currency: "ILS",
+        value: product.price,
+        items: [{ item_id: product.id, item_name: product.name, price: product.price, quantity: 1 }],
+      },
+    });
+
+    fetch("/api/meta-capi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        event: "AddToCart",
+        value: product.price,
+        contentId: product.id,
+        contentName: product.name,
+      }),
+    }).catch(() => {});
+  };
   const content = productContent[product.gtin];
   const compareAtPrice = content?.compareAtPrice;
   const discount = compareAtPrice ? Math.round(((compareAtPrice - product.price) / compareAtPrice) * 100) : 0;
@@ -51,7 +78,7 @@ export default function ProductCard({ product, featured = false }: { product: St
             className="add-button"
             type="button"
             disabled={!inStock}
-            onClick={() => inStock && addItem({ id: product.id, name: product.name, price: product.price, image: product.image, stock })}
+            onClick={addToCart}
           >
             {inStock ? "הוספה לסל" : "אזל מהמלאי"} <span aria-hidden="true">+</span>
           </button>
