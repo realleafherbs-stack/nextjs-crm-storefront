@@ -34,24 +34,32 @@ export async function getProducts(): Promise<StoreProduct[]> {
     if (!res.ok) return fallbackProducts;
     const data: CrmProduct[] = await res.json();
     if (!Array.isArray(data) || data.length === 0) return fallbackProducts;
-    return data.map((p) => ({
-      // id is the CRM's database cuid (internal only); handle is the human-readable SKU — never use id as a display SKU.
-      id: p.id,
-      handle: p.handle,
-      name: p.name,
-      price: p.price,
-      badge: p.badge ?? undefined,
-      image: p.image ?? p.images?.[0] ?? "",
-      images: p.images ?? (p.image ? [p.image] : []),
-      cardFeatures: p.cardFeatures ?? [],
-      category: p.category ?? fallbackCategories[0],
-      categoryOrder: p.categoryOrder ?? 0,
-      // gtin doubles as the key into lib/product-content.ts's local editorial
-      // data — CRM never sets gtin for Payper-synced products, only
-      // payperSku (same barcode number), so fall back to that.
-      gtin: p.gtin ?? p.payperSku ?? "",
-      stock: resolveStock(p.stockQuantity),
-    }));
+    return data.map((p) => {
+      const gtin = p.gtin ?? p.payperSku ?? "";
+      const localProduct = fallbackProducts.find((candidate) => candidate.handle === p.handle || candidate.gtin === gtin);
+
+      return {
+        // id is the CRM's database cuid (internal only); handle is the human-readable SKU — never use id as a display SKU.
+        id: p.id,
+        handle: p.handle,
+        name: p.name,
+        price: p.price,
+        badge: p.badge ?? undefined,
+        // Payper image redirects are slow and occasionally fail in mobile Safari.
+        // Known catalog products use the curated same-origin assets; new CRM-only
+        // products still retain their remote imagery until a local asset is added.
+        image: localProduct?.image ?? p.image ?? p.images?.[0] ?? "",
+        images: localProduct?.images ?? p.images ?? (p.image ? [p.image] : []),
+        cardFeatures: p.cardFeatures ?? [],
+        category: p.category ?? fallbackCategories[0],
+        categoryOrder: p.categoryOrder ?? 0,
+        // gtin doubles as the key into lib/product-content.ts's local editorial
+        // data — CRM never sets gtin for Payper-synced products, only
+        // payperSku (same barcode number), so fall back to that.
+        gtin,
+        stock: resolveStock(p.stockQuantity),
+      };
+    });
   } catch {
     return fallbackProducts;
   }
