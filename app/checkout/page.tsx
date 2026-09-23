@@ -9,12 +9,6 @@ import { formatPrice } from "../../lib/constants";
 
 type Step = "shipping" | "payment";
 
-interface CouponResult {
-  code: string;
-  type: string;
-  value: number;
-}
-
 export default function CheckoutPage() {
   const { items, total } = useCart();
 
@@ -23,20 +17,9 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [couponCode, setCouponCode] = useState("");
-  const [couponLoading, setCouponLoading] = useState(false);
-  const [couponError, setCouponError] = useState<string | null>(null);
-  const [appliedCoupon, setAppliedCoupon] = useState<CouponResult | null>(null);
-
-  const discount = appliedCoupon
-    ? appliedCoupon.type === "PERCENT"
-      ? Math.round(((total * appliedCoupon.value) / 100) * 100) / 100
-      : Math.min(appliedCoupon.value, total)
-    : 0;
-  // Shipping is calculated from post-discount subtotal to match server-side logic (/api/hyp-checkout)
-  const subtotalAfterDiscount = Math.max(0, total - discount);
-  const shipping = subtotalAfterDiscount === 0 || subtotalAfterDiscount >= FREE_SHIPPING_THRESHOLD ? 0 : 29;
-  const finalTotal = subtotalAfterDiscount + shipping;
+  const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const shipping = total === 0 || total >= FREE_SHIPPING_THRESHOLD ? 0 : 29;
+  const finalTotal = total + shipping;
 
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
@@ -55,27 +38,6 @@ export default function CheckoutPage() {
     if (isShippingValid) setStep("payment");
   };
 
-  const handleCoupon = async () => {
-    if (!couponCode.trim()) return;
-    setCouponLoading(true);
-    setCouponError(null);
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_CRM_URL}/api/${process.env.NEXT_PUBLIC_CRM_SITE_SLUG}/validate-coupon`,
-        { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code: couponCode }) }
-      );
-      const data = await res.json();
-      if (!res.ok) setCouponError(data.error ?? "קוד קופון לא תקין");
-      else {
-        setAppliedCoupon(data);
-        setCouponCode("");
-      }
-    } catch {
-      setCouponError("שגיאה באימות הקופון");
-    }
-    setCouponLoading(false);
-  };
-
   const handlePay = async () => {
     setLoading(true);
     setError(null);
@@ -88,7 +50,6 @@ export default function CheckoutPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          coupon: appliedCoupon?.code,
           customer: { ...form, address: fullAddress },
           items: items.map((i) => ({ id: i.id, qty: i.quantity })),
         }),
@@ -132,8 +93,30 @@ export default function CheckoutPage() {
       <main id="main" className="checkout-page">
         <div className="shell">
           <h1>קופה</h1>
-          <div className="checkout-page__grid">
-            <div>
+          <div className="checkout-page__flow">
+            <details className="checkout-page__order-summary">
+              <summary>
+                <span className="checkout-page__order-summary-title">
+                  <b>פירוט הזמנה</b>
+                  <small>{itemCount} {itemCount === 1 ? "פריט" : "פריטים"}</small>
+                </span>
+                <strong>₪{formatPrice(finalTotal)}</strong>
+                <span className="checkout-page__order-summary-arrow" aria-hidden="true">⌄</span>
+              </summary>
+              <div className="checkout-page__order-summary-body">
+                {items.map((item) => (
+                  <div className="checkout-page__order-item" key={item.id}>
+                    <span>{item.name} × {item.quantity}</span>
+                    <b>₪{formatPrice(item.price * item.quantity)}</b>
+                  </div>
+                ))}
+                <div className="checkout-page__order-row"><span>סכום ביניים</span><b>₪{formatPrice(total)}</b></div>
+                <div className="checkout-page__order-row"><span>משלוח</span><b>{shipping === 0 ? "חינם" : `₪${formatPrice(shipping)}`}</b></div>
+                <div className="checkout-page__order-row checkout-page__order-row--total"><span>סה״כ</span><b>₪{formatPrice(finalTotal)}</b></div>
+              </div>
+            </details>
+
+            <div className="checkout-page__steps">
               <div className="checkout-page__tabs">
                 <button type="button" className={step === "shipping" ? "is-active" : undefined} onClick={() => setStep("shipping")}>
                   פרטי משלוח
@@ -148,52 +131,52 @@ export default function CheckoutPage() {
                   <h2>פרטים אישיים</h2>
                   <div className="checkout-page__row">
                     <div className="checkout-page__field">
-                      <label>שם פרטי</label>
-                      <input value={form.firstName} onChange={(e) => set("firstName")(e.target.value)} />
+                      <label htmlFor="checkout-first-name">שם פרטי</label>
+                      <input id="checkout-first-name" autoComplete="given-name" value={form.firstName} onChange={(e) => set("firstName")(e.target.value)} />
                       {submitted && !form.firstName.trim() && <p className="checkout-page__error">שדה חובה</p>}
                     </div>
                     <div className="checkout-page__field">
-                      <label>שם משפחה</label>
-                      <input value={form.lastName} onChange={(e) => set("lastName")(e.target.value)} />
+                      <label htmlFor="checkout-last-name">שם משפחה</label>
+                      <input id="checkout-last-name" autoComplete="family-name" value={form.lastName} onChange={(e) => set("lastName")(e.target.value)} />
                       {submitted && !form.lastName.trim() && <p className="checkout-page__error">שדה חובה</p>}
                     </div>
                   </div>
                   <div className="checkout-page__field">
-                    <label>אימייל</label>
-                    <input type="email" value={form.email} onChange={(e) => set("email")(e.target.value)} />
+                    <label htmlFor="checkout-email">אימייל</label>
+                    <input id="checkout-email" type="email" autoComplete="email" value={form.email} onChange={(e) => set("email")(e.target.value)} />
                     {submitted && !form.email.trim() && <p className="checkout-page__error">שדה חובה</p>}
                   </div>
                   <div className="checkout-page__field">
-                    <label>טלפון</label>
-                    <input type="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} />
+                    <label htmlFor="checkout-phone">טלפון</label>
+                    <input id="checkout-phone" type="tel" autoComplete="tel" value={form.phone} onChange={(e) => set("phone")(e.target.value)} />
                     {submitted && !form.phone.trim() && <p className="checkout-page__error">שדה חובה</p>}
                   </div>
                   <h2>כתובת למשלוח</h2>
                   <div className="checkout-page__field">
-                    <label>רחוב</label>
-                    <input value={form.street} onChange={(e) => set("street")(e.target.value)} />
+                    <label htmlFor="checkout-street">רחוב</label>
+                    <input id="checkout-street" autoComplete="address-line1" value={form.street} onChange={(e) => set("street")(e.target.value)} />
                     {submitted && !form.street.trim() && <p className="checkout-page__error">שדה חובה</p>}
                   </div>
                   <div className="checkout-page__row">
                     <div className="checkout-page__field">
-                      <label>מספר בית</label>
-                      <input value={form.houseNumber} onChange={(e) => set("houseNumber")(e.target.value)} />
+                      <label htmlFor="checkout-house-number">מספר בית</label>
+                      <input id="checkout-house-number" value={form.houseNumber} onChange={(e) => set("houseNumber")(e.target.value)} />
                       {submitted && !form.houseNumber.trim() && <p className="checkout-page__error">שדה חובה</p>}
                     </div>
                     <div className="checkout-page__field">
-                      <label>דירה</label>
-                      <input value={form.apartment} onChange={(e) => set("apartment")(e.target.value)} />
+                      <label htmlFor="checkout-apartment">דירה</label>
+                      <input id="checkout-apartment" value={form.apartment} onChange={(e) => set("apartment")(e.target.value)} />
                       {submitted && !form.apartment.trim() && <p className="checkout-page__error">שדה חובה</p>}
                     </div>
                   </div>
                   <div className="checkout-page__field">
-                    <label>עיר</label>
-                    <input value={form.city} onChange={(e) => set("city")(e.target.value)} />
+                    <label htmlFor="checkout-city">עיר</label>
+                    <input id="checkout-city" autoComplete="address-level2" value={form.city} onChange={(e) => set("city")(e.target.value)} />
                     {submitted && !form.city.trim() && <p className="checkout-page__error">שדה חובה</p>}
                   </div>
                   <div className="checkout-page__field">
-                    <label>הערות להזמנה (אופציונלי)</label>
-                    <textarea rows={3} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />
+                    <label htmlFor="checkout-notes">הערות להזמנה (אופציונלי)</label>
+                    <textarea id="checkout-notes" rows={3} value={form.notes} onChange={(e) => set("notes")(e.target.value)} />
                   </div>
                   <button className="button button--gold" type="button" onClick={handleContinue}>
                     המשך לתשלום
@@ -217,49 +200,10 @@ export default function CheckoutPage() {
                   <button className="button button--gold" type="button" disabled={loading} onClick={handlePay}>
                     {loading ? "מעבד…" : "לתשלום מאובטח"}
                   </button>
-                  <p style={{ fontSize: "12px", color: "var(--muted)", textAlign: "center" }}>התשלום מאובטח באמצעות Hyp Pay</p>
+                  <p className="checkout-page__secure-note">התשלום מאובטח באמצעות Hyp Pay</p>
                 </div>
               )}
             </div>
-
-            <aside className="cart-page__summary">
-              <h2>סיכום הזמנה</h2>
-              {items.map((item) => (
-                <div className="cart-page__summary-row" key={item.id}>
-                  <span>{item.name} × {item.quantity}</span>
-                  <span>₪{formatPrice(item.price * item.quantity)}</span>
-                </div>
-              ))}
-              <div className="cart-page__summary-row"><span>סכום ביניים</span><span>₪{formatPrice(total)}</span></div>
-              {discount > 0 && (
-                <div className="cart-page__summary-row"><span>הנחה ({appliedCoupon?.code})</span><span>-₪{formatPrice(discount)}</span></div>
-              )}
-              <div className="cart-page__summary-row"><span>משלוח</span><span>{shipping === 0 ? "חינם" : `₪${formatPrice(shipping)}`}</span></div>
-              <div className="cart-page__summary-row cart-page__summary-row--total"><span>סה״כ</span><span>₪{formatPrice(finalTotal)}</span></div>
-
-              {appliedCoupon ? (
-                <p style={{ fontSize: "13px", color: "#347247" }}>✓ קוד {appliedCoupon.code} הוחל</p>
-              ) : (
-                <div style={{ display: "flex", gap: "8px", marginTop: "8px" }}>
-                  <input
-                    style={{ flex: 1, border: "1px solid var(--line)", padding: "10px 12px", fontSize: "13px" }}
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    placeholder="קוד קופון"
-                  />
-                  <button
-                    type="button"
-                    className="button button--ghost"
-                    style={{ color: "var(--ink)", borderColor: "var(--line)" }}
-                    disabled={couponLoading}
-                    onClick={handleCoupon}
-                  >
-                    {couponLoading ? "…" : "החל"}
-                  </button>
-                </div>
-              )}
-              {couponError && <p className="checkout-page__error">{couponError}</p>}
-            </aside>
           </div>
         </div>
       </main>
