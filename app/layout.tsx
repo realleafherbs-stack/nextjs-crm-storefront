@@ -12,6 +12,7 @@ import CookieConsent from "./components/CookieConsent";
 import WhatsAppButton from "./components/WhatsAppButton";
 import ScrollReveal from "./components/ScrollReveal";
 import BodyClassSync from "./components/BodyClassSync";
+import MobileScrollBoundary from "./components/MobileScrollBoundary";
 import { getSiteSeo } from "../lib/seo";
 
 const defaultTitle = "HTC ישראל | מכונות תספורת וגילוח";
@@ -101,6 +102,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <IconSprite />
         <ScrollReveal />
         <BodyClassSync />
+        <MobileScrollBoundary />
       </body>
     </html>
   );
