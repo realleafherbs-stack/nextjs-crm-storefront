@@ -4216,9 +4216,9 @@ section[id]{scroll-margin-top:110px}
 .product-card__price>p{margin:8px 0 0!important;color:#8b857a!important;font-size:9px!important;letter-spacing:.04em}
 .products .product-card__warranty,.shop-catalog .product-card__warranty{display:flex;align-items:center;margin:12px 0 0!important;color:#4f493f!important;font-size:10px!important}
 
-/* Mobile footer end-state: keep the page boundary dark beneath the fixed buy bar. */
+/* Mobile footer end-state: keep Safari's root canvas dark beyond every footer. */
 @media(max-width:700px){
-  html:has(body.product-template){
+  html{
     background:#070706;
     overscroll-behavior-y:none;
   }
