@@ -85,14 +85,16 @@ export default function CookieConsent() {
       )}
       {!saved && (
         <aside className="cookie-consent__banner" aria-labelledby="cookieBannerTitle">
-          <small>הפרטיות שלכם</small>
-          <h2 id="cookieBannerTitle">אתם שולטים בעוגיות</h2>
-          <p>אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. עוגיות נוספות יופעלו רק לפי הבחירה שלכם.</p>
-          <a href="/privacy">למדיניות הפרטיות</a>
-          <div>
-            <button type="button" onClick={() => save({ functional: true, analytics: true, marketing: true })}>קבל הכול</button>
-            <button type="button" onClick={() => save({ functional: false, analytics: false, marketing: false })}>חיוניות בלבד</button>
-            <button type="button" onClick={openDialog}>ניהול העדפות</button>
+          <div className="cookie-consent__copy">
+            <small>הפרטיות שלכם</small>
+            <h2 id="cookieBannerTitle">אתם שולטים בעוגיות</h2>
+            <p>אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. עוגיות נוספות יופעלו רק לפי הבחירה שלכם.</p>
+            <a href="/privacy">למדיניות הפרטיות</a>
+          </div>
+          <div className="cookie-consent__actions">
+            <button data-cookie-action="accept" type="button" onClick={() => save({ functional: true, analytics: true, marketing: true })}>קבל הכול</button>
+            <button data-cookie-action="necessary" type="button" onClick={() => save({ functional: false, analytics: false, marketing: false })}>חיוניות בלבד</button>
+            <button data-cookie-action="manage" type="button" onClick={openDialog}>ניהול העדפות</button>
           </div>
         </aside>
       )}
