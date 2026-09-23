@@ -20,4 +20,14 @@ describe("mobile cart drawer layout", () => {
     expect(mobileCartCss).toMatch(/\.cart__items\s*\{[^}]*flex:\s*0 1 auto[^}]*overflow-y:\s*auto[^}]*\}/s);
     expect(mobileCartCss).toMatch(/\.cart__foot\s*\{[^}]*flex:\s*none[^}]*\}/s);
   });
+
+  it("keeps the quantity control visually compact and separated from the item price", () => {
+    const marker = "/* Compact cart quantity control */";
+    expect(css).toContain(marker);
+
+    const compactControlCss = css.slice(css.indexOf(marker));
+    expect(compactControlCss).toMatch(/\.cart-item__content>small\s*\{[^}]*display:\s*block[^}]*margin-top:\s*8px[^}]*\}/s);
+    expect(compactControlCss).toMatch(/\.cart-item__quantity\s*\{[^}]*grid-template-columns:\s*36px 24px 36px[^}]*height:\s*36px[^}]*margin-top:\s*16px[^}]*\}/s);
+    expect(compactControlCss).toMatch(/\.cart-item__quantity button\s*\{[^}]*width:\s*44px[^}]*height:\s*44px[^}]*margin:\s*-4px[^}]*\}/s);
+  });
 });

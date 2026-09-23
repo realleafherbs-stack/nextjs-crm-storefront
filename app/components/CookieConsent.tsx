@@ -79,8 +79,9 @@ export default function CookieConsent() {
   return (
     <div className="cookie-consent">
       {saved && (
-        <button className="site-control cookie-consent__trigger" type="button" aria-label="פתיחת הגדרות עוגיות" onClick={openDialog}>
+        <button className="site-control cookie-consent__trigger" type="button" aria-label="פתיחת העדפות קוקיז" onClick={openDialog}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14M5 16h14"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="16" r="2"/></svg>
+          <span>קוקיז</span>
         </button>
       )}
       {!saved && (

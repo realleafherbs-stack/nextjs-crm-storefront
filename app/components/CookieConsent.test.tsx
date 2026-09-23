@@ -26,7 +26,7 @@ describe("CookieConsent", () => {
     expect(manage.getAttribute("data-cookie-action")).toBe("manage");
   });
 
-  it("stores the privacy-first choice and removes the banner", async () => {
+  it("stores the privacy-first choice and leaves a clearly labelled compact preferences control", async () => {
     const user = userEvent.setup();
     render(<CookieConsent />);
 
@@ -35,6 +35,8 @@ describe("CookieConsent", () => {
     await waitFor(() => {
       expect(screen.queryByRole("heading", { name: "אתם שולטים בעוגיות" })).toBeNull();
     });
+    const preferences = screen.getByRole("button", { name: "פתיחת העדפות קוקיז" });
+    expect(preferences.textContent).toContain("קוקיז");
     expect(JSON.parse(localStorage.getItem("htc-israel-cookie-consent-v1") || "null")).toEqual({
       necessary: true,
       functional: false,
