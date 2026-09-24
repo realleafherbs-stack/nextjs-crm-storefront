@@ -1,4 +1,6 @@
 import { expect, it } from "vitest";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 
 it("serves robots rules that advertise the live sitemap", async () => {
   const module = await import("./robots").catch(() => ({}));
@@ -19,6 +21,13 @@ it("serves robots rules that advertise the live sitemap", async () => {
     if (previousSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
     else process.env.NEXT_PUBLIC_SITE_URL = previousSiteUrl;
   }
+});
+
+it("keeps the Google Search Console verification file publicly deployable", async () => {
+  const verificationFile = "google738c87d7da2440a3.html";
+  const contents = await readFile(join(process.cwd(), "public", verificationFile), "utf8");
+
+  expect(contents.trim()).toBe(`google-site-verification: ${verificationFile}`);
 });
 
 it("serves a sitemap containing every catalog product", async () => {
