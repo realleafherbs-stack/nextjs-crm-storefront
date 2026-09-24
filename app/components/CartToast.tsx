@@ -4,21 +4,30 @@ import { useEffect } from "react";
 import { useCart } from "../context/CartContext";
 
 export default function CartToast() {
-  const { toast, dismissToast } = useCart();
+  const { toast, dismissToast, isPanelOpen } = useCart();
 
   useEffect(() => {
     if (!toast) return;
-    const timer = window.setTimeout(dismissToast, 3200);
+    const timer = window.setTimeout(dismissToast, 3000);
     return () => window.clearTimeout(timer);
   }, [toast, dismissToast]);
 
-  if (!toast) return null;
+  if (!toast || isPanelOpen) return null;
 
   return (
-    <div className="toast is-visible" role="status" aria-live="polite">
-      <span>{toast.message}</span>
+    <div
+      className="cart-toast is-visible"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      <span className="cart-toast__message">
+        <span className="cart-toast__icon" aria-hidden="true">✓</span>
+        {toast.message}
+      </span>
       {toast.actionLabel && toast.onAction && (
         <button
+          className="cart-toast__action"
           type="button"
           onClick={() => {
             toast.onAction?.();

@@ -79,20 +79,23 @@ export default function CookieConsent() {
   return (
     <div className="cookie-consent">
       {saved && (
-        <button className="site-control cookie-consent__trigger" type="button" aria-label="פתיחת הגדרות עוגיות" onClick={openDialog}>
+        <button className="site-control cookie-consent__trigger" type="button" aria-label="פתיחת העדפות קוקיז" onClick={openDialog}>
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 8h14M5 16h14"/><circle cx="9" cy="8" r="2"/><circle cx="15" cy="16" r="2"/></svg>
+          <span>קוקיז</span>
         </button>
       )}
       {!saved && (
         <aside className="cookie-consent__banner" aria-labelledby="cookieBannerTitle">
-          <small>הפרטיות שלכם</small>
-          <h2 id="cookieBannerTitle">אתם שולטים בעוגיות</h2>
-          <p>אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. עוגיות נוספות יופעלו רק לפי הבחירה שלכם.</p>
-          <a href="/privacy">למדיניות הפרטיות</a>
-          <div>
-            <button type="button" onClick={() => save({ functional: true, analytics: true, marketing: true })}>קבל הכול</button>
-            <button type="button" onClick={() => save({ functional: false, analytics: false, marketing: false })}>חיוניות בלבד</button>
-            <button type="button" onClick={openDialog}>ניהול העדפות</button>
+          <div className="cookie-consent__copy">
+            <small>הפרטיות שלכם</small>
+            <h2 id="cookieBannerTitle">אתם שולטים בעוגיות</h2>
+            <p>אנחנו משתמשים בעוגיות חיוניות להפעלת האתר. עוגיות נוספות יופעלו רק לפי הבחירה שלכם.</p>
+            <a href="/privacy">למדיניות הפרטיות</a>
+          </div>
+          <div className="cookie-consent__actions">
+            <button data-cookie-action="accept" type="button" onClick={() => save({ functional: true, analytics: true, marketing: true })}>קבל הכול</button>
+            <button data-cookie-action="necessary" type="button" onClick={() => save({ functional: false, analytics: false, marketing: false })}>חיוניות בלבד</button>
+            <button data-cookie-action="manage" type="button" onClick={openDialog}>ניהול העדפות</button>
           </div>
         </aside>
       )}

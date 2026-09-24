@@ -49,7 +49,7 @@ export default function ProductCard({ product, featured = false }: { product: St
         <img className="product-shot" src={product.image} loading="lazy" decoding="async" alt={product.name} />
       </div>
       <div className="product-card__body">
-        <div>
+        <div className="product-card__intro">
           <small>{product.handle.toUpperCase()} · {product.category.name}</small>
           <h3>{product.name}</h3>
           <p className="product-card__features">{product.cardFeatures.join(" · ")}</p>

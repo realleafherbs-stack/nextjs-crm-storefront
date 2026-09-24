@@ -18,6 +18,8 @@ Dev port: **3004**.
 
 - No Tailwind — `app/globals.css` is a near-verbatim port of the original static site's custom
   CSS design system. Build UI against its existing class names, not new utility classes.
+- Responsive UI work should follow the audience, brand, and accessibility principles documented
+  in [`.impeccable.md`](./.impeccable.md).
 - Product editorial content (specs, FAQ answers, "story" copy) and compare-at pricing live in
   `lib/product-content.ts`, not in CRM — see the design spec for why.
 - Orders use the CheckoutIntent pattern (`lib/orders.ts`): nothing is written to the CRM as a

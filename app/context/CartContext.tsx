@@ -76,6 +76,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [items, hydrated]);
 
+  useEffect(() => {
+    document.body.classList.toggle("no-scroll", isPanelOpen);
+
+    return () => {
+      document.body.classList.remove("no-scroll");
+    };
+  }, [isPanelOpen]);
+
   const openPanel = () => setIsPanelOpen(true);
   const closePanel = () => setIsPanelOpen(false);
   const dismissToast = () => setToast(null);
@@ -90,7 +98,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }
       return [...prev, { ...item, quantity: Math.min(cap, amount) }];
     });
-    setToast({ message: `נוסף לסל: ${item.name}`, actionLabel: "לצפייה בסל", onAction: openPanel });
+    setToast({ message: "המוצר נוסף לסל", actionLabel: "לצפייה בסל", onAction: openPanel });
   };
 
   const removeItem = (id: string) => {
