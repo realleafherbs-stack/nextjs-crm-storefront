@@ -13,6 +13,11 @@ export interface StoreProduct {
   categoryOrder: number;
   gtin: string;
   stock?: number;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogImage?: string | null;
+  canonicalUrl?: string | null;
+  indexable?: boolean | null;
 }
 
 const [clipper, trimmer, shaver] = categories;

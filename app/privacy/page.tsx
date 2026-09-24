@@ -5,6 +5,7 @@ import LegalPageLayout from "../components/LegalPageLayout";
 export const metadata: Metadata = {
   title: "מדיניות פרטיות | HTC ישראל",
   description: "מדיניות הפרטיות של אתר HTC ישראל ואופן הטיפול במידע אישי.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

@@ -14,6 +14,7 @@ import ScrollReveal from "./components/ScrollReveal";
 import BodyClassSync from "./components/BodyClassSync";
 import MobileScrollBoundary from "./components/MobileScrollBoundary";
 import { getSiteSeo } from "../lib/seo";
+import { buildSiteStructuredData, DEFAULT_SITE_URL } from "../lib/seo-metadata";
 
 const defaultTitle = "HTC ישראל | מכונות תספורת וגילוח";
 const defaultDescription = "HTC ישראל — מכונות תספורת, טרימרים ומכונות גילוח עם אחריות ושירות בישראל.";
@@ -26,14 +27,30 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = seo.metaDescription || defaultDescription;
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3004"),
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL),
     title,
     description,
+    alternates: { canonical: "/" },
     manifest: "/site.webmanifest",
     icons: {
       icon: "/assets/brand/htc-logo-black.png",
     },
-    ...(seo.ogImage ? { openGraph: { title, description, images: [{ url: seo.ogImage }] } } : {}),
+    openGraph: {
+      type: "website",
+      locale: "he_IL",
+      siteName: "HTC ישראל",
+      title,
+      description,
+      url: "/",
+      ...(seo.ogImage ? { images: [{ url: seo.ogImage }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(seo.ogImage ? { images: [seo.ogImage] } : {}),
+    },
+    robots: { index: true, follow: true },
     other: {
       "facebook-domain-verification": "lp9xly4y7wf0pkh0hix9mr45n2fowz",
     },
@@ -58,9 +75,16 @@ const ALLOWED_BODY_CLASSES = new Set(["compare-page compare-page--refined", "sho
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const requestedClass = (await headers()).get("x-body-class") ?? "";
   const bodyClass = ALLOWED_BODY_CLASSES.has(requestedClass) ? requestedClass : "";
+  const siteStructuredData = buildSiteStructuredData(process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL);
 
   return (
     <html lang="he" dir="rtl">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(siteStructuredData).replace(/</g, "\\u003c") }}
+        />
+      </head>
       <Script id="consent-default" strategy="beforeInteractive">
         {`
           window.dataLayer = window.dataLayer || [];

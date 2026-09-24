@@ -18,6 +18,11 @@ interface CrmProduct {
   gtin?: string | null;
   payperSku?: string | null;
   stockQuantity?: number | null;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
+  ogImage?: string | null;
+  canonicalUrl?: string | null;
+  indexable?: boolean | null;
 }
 
 // A product Payper doesn't actively track has no stockQuantity at all — treat
@@ -58,6 +63,11 @@ export async function getProducts(): Promise<StoreProduct[]> {
         // payperSku (same barcode number), so fall back to that.
         gtin,
         stock: resolveStock(p.stockQuantity),
+        metaTitle: p.metaTitle,
+        metaDescription: p.metaDescription,
+        ogImage: p.ogImage,
+        canonicalUrl: p.canonicalUrl,
+        indexable: p.indexable,
       };
     });
   } catch {
