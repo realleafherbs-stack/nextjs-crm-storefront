@@ -7,11 +7,18 @@ it("serves robots rules that advertise the live sitemap", async () => {
   expect(robots).toBeTypeOf("function");
   if (typeof robots !== "function") return;
 
-  expect(robots()).toMatchObject({
-    rules: expect.arrayContaining([{ userAgent: "*", allow: "/" }]),
-    sitemap: "https://www.htcpro.co.il/sitemap.xml",
-    host: "https://www.htcpro.co.il",
-  });
+  const previousSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  process.env.NEXT_PUBLIC_SITE_URL = "https://nextjs-crm-storefront.vercel.app";
+  try {
+    expect(robots()).toMatchObject({
+      rules: expect.arrayContaining([{ userAgent: "*", allow: "/" }]),
+      sitemap: "https://www.htcpro.co.il/sitemap.xml",
+      host: "https://www.htcpro.co.il",
+    });
+  } finally {
+    if (previousSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = previousSiteUrl;
+  }
 });
 
 it("serves a sitemap containing every catalog product", async () => {
@@ -21,11 +28,32 @@ it("serves a sitemap containing every catalog product", async () => {
   expect(sitemap).toBeTypeOf("function");
   if (typeof sitemap !== "function") return;
 
-  const entries = await sitemap();
+  const previousSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  process.env.NEXT_PUBLIC_SITE_URL = "https://nextjs-crm-storefront.vercel.app";
+  let entries: Awaited<ReturnType<typeof sitemap>>;
+  try {
+    entries = await sitemap();
+  } finally {
+    if (previousSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = previousSiteUrl;
+  }
   const urls = entries.map((entry: { url: string }) => entry.url);
 
   expect(urls).toContain("https://www.htcpro.co.il/shop/at-158");
   expect(urls).toContain("https://www.htcpro.co.il/shop/at-799");
+});
+
+it("keeps the public metadata base on htcpro.co.il when Vercel exposes its deployment URL", async () => {
+  const { generateMetadata } = await import("./layout");
+  const previousSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  process.env.NEXT_PUBLIC_SITE_URL = "https://nextjs-crm-storefront.vercel.app";
+  try {
+    const metadata = await generateMetadata();
+    expect(metadata.metadataBase?.toString()).toBe("https://www.htcpro.co.il/");
+  } finally {
+    if (previousSiteUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = previousSiteUrl;
+  }
 });
 
 it("connects product metadata to the canonical and social SEO builder", async () => {

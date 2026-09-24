@@ -4,12 +4,16 @@ import type { StoreProduct } from "./products-data";
 
 export const DEFAULT_SITE_URL = "https://www.htcpro.co.il";
 
+export function getCanonicalSiteUrl() {
+  return (process.env.NEXT_PUBLIC_CANONICAL_URL || DEFAULT_SITE_URL).replace(/\/+$/, "");
+}
+
 type JsonLd = {
   "@context": "https://schema.org";
   "@graph": Record<string, unknown>[];
 };
 
-function normalizedSiteUrl(siteUrl = process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL) {
+function normalizedSiteUrl(siteUrl = getCanonicalSiteUrl()) {
   return siteUrl.replace(/\/+$/, "");
 }
 
