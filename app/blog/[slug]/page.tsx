@@ -32,7 +32,9 @@ export default async function BlogArticlePage({ params }: BlogPageProps) {
   const [post, products, allPosts] = await Promise.all([getBlogBySlug(slug), getProducts(), getBlogs()]);
   if (!post) notFound();
 
-  const relatedProducts = products.filter((product) => post.relatedProductIds.includes(product.id)).slice(0, 3);
+  const relatedProducts = products
+    .filter((product) => post.relatedProductIds.includes(product.id) || post.relatedProductIds.includes(product.handle))
+    .slice(0, 3);
   const relatedPosts = allPosts
     .filter((candidate) => candidate.slug !== post.slug && (post.relatedBlogIds.includes(candidate.id) || candidate.tags.some((tag) => post.tags.includes(tag))))
     .slice(0, 3);
