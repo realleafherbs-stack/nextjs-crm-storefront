@@ -9,6 +9,7 @@ export default function InnerFooter() {
           <Link href="/privacy">פרטיות</Link>
           <Link href="/terms">תקנון</Link>
           <Link href="/shipping">משלוחים</Link>
+          <Link href="/blog">מדריכים</Link>
           <Link href="/accessibility">נגישות</Link>
           <Link href="/contact">צור קשר</Link>
         </nav>

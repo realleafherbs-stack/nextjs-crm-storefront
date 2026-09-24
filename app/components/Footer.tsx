@@ -12,6 +12,7 @@ export default function Footer() {
           <h3>הקולקציה</h3>
           <Link href="/shop">לכל הדגמים</Link>
           <Link href="/compare">השוואת דגמים</Link>
+          <Link href="/blog">מדריכים מקצועיים</Link>
         </div>
         <div>
           <h3>המותג</h3>

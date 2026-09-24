@@ -9,6 +9,7 @@ const navLinks = [
   { href: "/", label: "דף הבית" },
   { href: "/shop", label: "החנות" },
   { href: "/compare", label: "השוואת דגמים" },
+  { href: "/blog", label: "מדריכים" },
   { href: "/#service", label: "אחריות ושירות" },
   { href: "/contact", label: "צור קשר" },
 ];
