@@ -5,6 +5,7 @@ import LegalPageLayout from "../components/LegalPageLayout";
 export const metadata: Metadata = {
   title: "הצהרת נגישות | HTC ישראל",
   description: "הצהרת הנגישות של אתר HTC ישראל והדרכים לפנות בנושא נגישות.",
+  alternates: { canonical: "/accessibility" },
 };
 
 export default function AccessibilityPage() {

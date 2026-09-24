@@ -4,6 +4,7 @@ import LegalPageLayout from "../components/LegalPageLayout";
 export const metadata: Metadata = {
   title: "משלוחים והחזרות | HTC ישראל",
   description: "מידע על משלוחים, מעקב, החלפות והחזרות בהזמנות HTC ישראל.",
+  alternates: { canonical: "/shipping" },
 };
 
 export default function ShippingPage() {

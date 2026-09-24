@@ -5,6 +5,7 @@ import LegalPageLayout from "../components/LegalPageLayout";
 export const metadata: Metadata = {
   title: "תקנון ותנאי שימוש | HTC ישראל",
   description: "תקנון אתר HTC ישראל ותנאי השימוש, ההזמנה, האחריות וההחזרות.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

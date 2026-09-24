@@ -5,6 +5,7 @@ import LegalPageLayout from "../components/LegalPageLayout";
 export const metadata: Metadata = {
   title: "אחריות ושירות | HTC ישראל",
   description: "אחריות ושירות למוצרי HTC ישראל — 12 חודשי אחריות יבואן רשמי, אופן הפעלת האחריות ויצירת קשר.",
+  alternates: { canonical: "/warranty" },
 };
 
 export default function WarrantyPage() {
