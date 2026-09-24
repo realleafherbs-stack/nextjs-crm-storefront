@@ -2,6 +2,11 @@ const CRM_URL = process.env.CRM_URL;
 const SITE_SLUG = process.env.CRM_SITE_SLUG;
 const CRM_API_KEY = process.env.CRM_API_KEY;
 
+async function fallbackPosts() {
+  const { fallbackBlogPosts } = await import("./blog-content");
+  return fallbackBlogPosts;
+}
+
 export interface BlogFaq {
   question: string;
   answer: string;
@@ -33,6 +38,12 @@ export interface BlogPost {
   publishedAt?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+}
+
+export function mergeBlogPosts(crmPosts: BlogPost[], builtInPosts: BlogPost[]): BlogPost[] {
+  const crmSlugs = new Set(crmPosts.map((post) => post.slug));
+  return [...crmPosts, ...builtInPosts.filter((post) => !crmSlugs.has(post.slug))]
+    .sort((a, b) => new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime());
 }
 
 type BlogSummary = Pick<BlogPost, "id" | "title" | "slug" | "publishedAt" | "featuredImage" | "metaTitle" | "metaDescription" | "ogImage" | "tags">;
@@ -99,28 +110,31 @@ async function fetchBlogBySlug(slug: string): Promise<BlogPost | null> {
 }
 
 export async function getBlogs(): Promise<BlogPost[]> {
-  if (!CRM_URL || !SITE_SLUG || !CRM_API_KEY) return [];
+  if (!CRM_URL || !SITE_SLUG || !CRM_API_KEY) return fallbackPosts();
   try {
     const response = await fetch(`${CRM_URL}/api/${SITE_SLUG}/blogs`, {
       headers: crmHeaders(),
       next: { revalidate: 300 },
       signal: AbortSignal.timeout(8000),
     });
-    if (!response.ok) return [];
+    if (!response.ok) return fallbackPosts();
     const summaries: BlogSummary[] = await response.json();
-    if (!Array.isArray(summaries)) return [];
+    if (!Array.isArray(summaries) || summaries.length === 0) return fallbackPosts();
 
     const posts = await Promise.all(summaries.map((summary) => fetchBlogBySlug(summary.slug)));
-    return posts.filter((post): post is BlogPost => Boolean(post));
+    const publishedPosts = posts.filter((post): post is BlogPost => Boolean(post));
+    return mergeBlogPosts(publishedPosts, await fallbackPosts());
   } catch {
-    return [];
+    return fallbackPosts();
   }
 }
 
 export async function getBlogBySlug(slug: string): Promise<BlogPost | null> {
   try {
-    return await fetchBlogBySlug(slug);
+    const post = await fetchBlogBySlug(slug);
+    if (post) return post;
   } catch {
-    return null;
+    // Fall through to the built-in editorial content when the CRM is unavailable.
   }
+  return (await fallbackPosts()).find((post) => post.slug === slug) ?? null;
 }
