@@ -8,6 +8,7 @@ const links = [
   { href: "/", label: "דף הבית" },
   { href: "/shop", label: "המוצרים" },
   { href: "/compare", label: "השוואה" },
+  { href: "/blog", label: "מדריכים" },
   { href: "/contact", label: "צור קשר" },
 ];
 

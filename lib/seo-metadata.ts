@@ -1,6 +1,7 @@
 import type { Metadata, MetadataRoute } from "next";
 import { WARRANTY_FAQ_ANSWER, type ProductContent } from "./product-content";
 import type { StoreProduct } from "./products-data";
+import type { BlogPost } from "./blogs";
 
 export const DEFAULT_SITE_URL = "https://www.htcpro.co.il";
 
@@ -30,6 +31,125 @@ function productCanonical(product: StoreProduct, siteUrl: string) {
   return product.canonicalUrl
     ? absoluteUrl(product.canonicalUrl, siteUrl)
     : absoluteUrl(`/shop/${encodeURIComponent(product.handle)}`, siteUrl);
+}
+
+function blogCanonical(post: BlogPost, siteUrl: string) {
+  return post.canonicalUrl
+    ? absoluteUrl(post.canonicalUrl, siteUrl)
+    : absoluteUrl(`/blog/${encodeURIComponent(post.slug)}`, siteUrl);
+}
+
+export function buildBlogMetadata(post: BlogPost, siteUrl = DEFAULT_SITE_URL): Metadata {
+  const title = post.metaTitle || `${post.title} | HTC ישראל`;
+  const description = post.metaDescription || post.excerpt || post.directAnswer || post.title;
+  const canonical = blogCanonical(post, siteUrl);
+  const imageValue = post.ogImage || post.featuredImage;
+  const image = imageValue ? absoluteUrl(imageValue, siteUrl) : undefined;
+  const indexable = post.indexable !== false;
+
+  return {
+    title,
+    description,
+    alternates: { canonical },
+    robots: { index: indexable, follow: indexable },
+    openGraph: {
+      type: "article",
+      locale: "he_IL",
+      siteName: "HTC ישראל",
+      title,
+      description,
+      url: canonical,
+      ...(post.publishedAt ? { publishedTime: post.publishedAt } : {}),
+      ...(post.updatedAt ? { modifiedTime: post.updatedAt } : {}),
+      ...(post.tags.length ? { tags: post.tags } : {}),
+      ...(image ? { images: [{ url: image, alt: post.title }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      ...(image ? { images: [{ url: image, alt: post.title }] } : {}),
+    },
+  };
+}
+
+export function buildBlogStructuredData(post: BlogPost, siteUrl = DEFAULT_SITE_URL): JsonLd {
+  const baseUrl = normalizedSiteUrl(siteUrl);
+  const canonical = blogCanonical(post, baseUrl);
+  const imageValue = post.ogImage || post.featuredImage;
+  const graph: Record<string, unknown>[] = [
+    {
+      "@type": "BlogPosting",
+      "@id": `${canonical}#article`,
+      headline: post.title,
+      description: post.metaDescription || post.excerpt || post.directAnswer || post.title,
+      mainEntityOfPage: { "@id": canonical },
+      ...(imageValue ? { image: absoluteUrl(imageValue, baseUrl) } : {}),
+      ...(post.publishedAt ? { datePublished: post.publishedAt } : {}),
+      ...(post.updatedAt ? { dateModified: post.updatedAt } : {}),
+      ...(post.tags.length ? { keywords: post.tags } : {}),
+      author: {
+        "@type": "Organization",
+        name: post.authorName || "צוות HTC ישראל",
+        url: `${baseUrl}/`,
+      },
+      publisher: { "@id": `${baseUrl}/#organization` },
+      inLanguage: "he-IL",
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": `${canonical}#breadcrumb`,
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "דף הבית", item: `${baseUrl}/` },
+        { "@type": "ListItem", position: 2, name: "המדריך של HTC", item: `${baseUrl}/blog` },
+        { "@type": "ListItem", position: 3, name: post.title, item: canonical },
+      ],
+    },
+  ];
+
+  if (post.faq.length) {
+    graph.push({
+      "@type": "FAQPage",
+      "@id": `${canonical}#faq`,
+      mainEntity: post.faq.map(({ question, answer }) => ({
+        "@type": "Question",
+        name: question,
+        acceptedAnswer: { "@type": "Answer", text: answer },
+      })),
+    });
+  }
+
+  return { "@context": "https://schema.org", "@graph": graph };
+}
+
+export function buildBlogIndexStructuredData(posts: BlogPost[], siteUrl = DEFAULT_SITE_URL): JsonLd {
+  const baseUrl = normalizedSiteUrl(siteUrl);
+  const indexablePosts = posts.filter((post) => post.indexable !== false);
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Blog",
+        "@id": `${baseUrl}/blog#blog`,
+        name: "המדריך של HTC ישראל",
+        description: "מדריכים מקצועיים לבחירת מכונות תספורת, טרימרים ומכונות גילוח לבית, למספרה ולעסקים.",
+        url: `${baseUrl}/blog`,
+        inLanguage: "he-IL",
+        publisher: { "@id": `${baseUrl}/#organization` },
+      },
+      {
+        "@type": "ItemList",
+        "@id": `${baseUrl}/blog#articles`,
+        numberOfItems: indexablePosts.length,
+        itemListElement: indexablePosts.map((post, index) => ({
+          "@type": "ListItem",
+          position: index + 1,
+          name: post.title,
+          url: blogCanonical(post, baseUrl),
+        })),
+      },
+    ],
+  };
 }
 
 export function buildProductMetadata(
@@ -142,9 +262,26 @@ export function buildSiteStructuredData(siteUrl = DEFAULT_SITE_URL): JsonLd {
         "@type": "Organization",
         "@id": `${baseUrl}/#organization`,
         name: "HTC ישראל",
+        legalName: "B2B MARKT LTD",
         url: `${baseUrl}/`,
         logo: `${baseUrl}/assets/brand/htc-logo-black.png`,
         description: "מכונות תספורת, טרימרים ומכונות גילוח HTC עם אחריות ושירות בישראל.",
+        email: "service@htc-israel.co.il",
+        address: {
+          "@type": "PostalAddress",
+          streetAddress: "המרכבה 25",
+          addressLocality: "חולון",
+          addressCountry: "IL",
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer service",
+          email: "service@htc-israel.co.il",
+          url: `${baseUrl}/contact`,
+          availableLanguage: ["he"],
+          areaServed: "IL",
+        },
+        knowsAbout: ["מכונות תספורת", "טרימרים", "מכונות גילוח", "ציוד למספרות"],
       },
       {
         "@type": "WebSite",
@@ -160,12 +297,14 @@ export function buildSiteStructuredData(siteUrl = DEFAULT_SITE_URL): JsonLd {
 
 export function buildSitemapEntries(
   products: StoreProduct[],
-  siteUrl = DEFAULT_SITE_URL
+  siteUrl = DEFAULT_SITE_URL,
+  blogPosts: BlogPost[] = []
 ): MetadataRoute.Sitemap {
   const baseUrl = normalizedSiteUrl(siteUrl);
   const pages: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${baseUrl}/shop`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${baseUrl}/blog`, changeFrequency: "weekly", priority: 0.75 },
     { url: `${baseUrl}/compare`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/contact`, changeFrequency: "monthly", priority: 0.5 },
     { url: `${baseUrl}/warranty`, changeFrequency: "monthly", priority: 0.5 },
@@ -182,5 +321,14 @@ export function buildSitemapEntries(
       priority: 0.8,
     }));
 
-  return [...pages, ...productPages];
+  const blogPages: MetadataRoute.Sitemap = blogPosts
+    .filter((post) => post.indexable !== false)
+    .map((post) => ({
+      url: blogCanonical(post, baseUrl),
+      lastModified: post.updatedAt || post.publishedAt || undefined,
+      changeFrequency: "monthly" as const,
+      priority: 0.65,
+    }));
+
+  return [...pages, ...productPages, ...blogPages];
 }
