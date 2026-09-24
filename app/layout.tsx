@@ -14,7 +14,7 @@ import ScrollReveal from "./components/ScrollReveal";
 import BodyClassSync from "./components/BodyClassSync";
 import MobileScrollBoundary from "./components/MobileScrollBoundary";
 import { getSiteSeo } from "../lib/seo";
-import { buildSiteStructuredData, DEFAULT_SITE_URL } from "../lib/seo-metadata";
+import { buildSiteStructuredData, getCanonicalSiteUrl } from "../lib/seo-metadata";
 
 const defaultTitle = "HTC ישראל | מכונות תספורת וגילוח";
 const defaultDescription = "HTC ישראל — מכונות תספורת, טרימרים ומכונות גילוח עם אחריות ושירות בישראל.";
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = seo.metaDescription || defaultDescription;
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? DEFAULT_SITE_URL),
+    metadataBase: new URL(getCanonicalSiteUrl()),
     title,
     description,
     alternates: { canonical: "/" },
@@ -75,7 +75,7 @@ const ALLOWED_BODY_CLASSES = new Set(["compare-page compare-page--refined", "sho
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const requestedClass = (await headers()).get("x-body-class") ?? "";
   const bodyClass = ALLOWED_BODY_CLASSES.has(requestedClass) ? requestedClass : "";
-  const siteStructuredData = buildSiteStructuredData(process.env.NEXT_PUBLIC_SITE_URL || DEFAULT_SITE_URL);
+  const siteStructuredData = buildSiteStructuredData(getCanonicalSiteUrl());
 
   return (
     <html lang="he" dir="rtl">
