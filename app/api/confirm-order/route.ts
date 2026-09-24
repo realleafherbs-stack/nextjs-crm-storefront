@@ -21,6 +21,6 @@ export async function POST(req: NextRequest) {
   if (typeof orderId !== "string" || !orderId) {
     return NextResponse.json({ error: "Missing orderId" }, { status: 400 });
   }
-  const ok = await finalizeOrder(orderId);
-  return NextResponse.json({ ok });
+  const order = await finalizeOrder(orderId);
+  return NextResponse.json({ ok: order !== null });
 }

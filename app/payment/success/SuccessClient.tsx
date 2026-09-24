@@ -30,7 +30,6 @@ export default function SuccessClient({ orderId, amount }: { orderId: string; am
       }).catch(() => {});
 
       const orderTotal = Number(amount) || total;
-      const contentIds = items.map((i) => i.id);
 
       sendGTMEvent({ ecommerce: null });
       sendGTMEvent({
@@ -42,12 +41,10 @@ export default function SuccessClient({ orderId, amount }: { orderId: string; am
           items: items.map((i) => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.quantity })),
         },
       });
-
-      fetch("/api/meta-capi", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: "Purchase", value: orderTotal, orderId, contentIds }),
-      }).catch(() => {});
+      // Meta CAPI Purchase is sent server-side, from page.tsx, in the same
+      // request that finalizes the order — not from here — so it doesn't
+      // depend on the customer's browser staying open long enough to run
+      // this effect. See page.tsx for details.
     }
 
     clearCart();

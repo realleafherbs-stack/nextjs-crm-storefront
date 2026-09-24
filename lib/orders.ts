@@ -35,7 +35,7 @@ export interface OrderPayload {
   items: OrderItem[];
 }
 
-async function postToCrm(path: string, body?: unknown): Promise<boolean> {
+async function postToCrm(path: string, body?: unknown): Promise<Record<string, unknown> | null> {
   const url = `${process.env.CRM_URL}/api/${process.env.CRM_SITE_SLUG}${path}`;
   const attempts = 3;
 
@@ -51,21 +51,29 @@ async function postToCrm(path: string, body?: unknown): Promise<boolean> {
         signal: AbortSignal.timeout(10000),
         ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       });
-      if (res.ok) return true;
+      if (res.ok) return await res.json().catch(() => ({}));
     } catch {
       // fall through to retry
     }
     if (i < attempts - 1) await new Promise((r) => setTimeout(r, 800 * (i + 1)));
   }
-  return false;
+  return null;
+}
+
+export interface FinalizedOrder {
+  total: number;
+  items: OrderItem[];
+  customerEmail: string;
+  customerPhone: string;
 }
 
 export async function stageCheckoutIntent(orderId: string, payload: OrderPayload): Promise<boolean> {
   if (!ORDER_ID_PATTERN.test(orderId)) return false;
-  return postToCrm("/checkout-intents", { id: orderId, payload });
+  return (await postToCrm("/checkout-intents", { id: orderId, payload })) !== null;
 }
 
-export async function finalizeOrder(orderId: string): Promise<boolean> {
-  if (!ORDER_ID_PATTERN.test(orderId)) return false;
-  return postToCrm(`/checkout-intents/${encodeURIComponent(orderId)}/finalize`);
+export async function finalizeOrder(orderId: string): Promise<FinalizedOrder | null> {
+  if (!ORDER_ID_PATTERN.test(orderId)) return null;
+  const result = await postToCrm(`/checkout-intents/${encodeURIComponent(orderId)}/finalize`);
+  return (result?.order as FinalizedOrder | undefined) ?? null;
 }
