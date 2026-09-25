@@ -4008,6 +4008,80 @@ section[id]{scroll-margin-top:110px}
   .utility .utility__inner{overflow-x:auto}
 }
 
+/* Static shipping promise: the purchase incentive stays readable on every visit. */
+.utility{
+  height:38px;
+  display:flex;
+  align-items:center;
+  background:#12110e;
+}
+.utility .utility__inner{
+  width:100%;
+  max-width:var(--shell);
+  padding-inline:16px;
+}
+.utility__shipping-offer{
+  min-height:38px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:9px;
+  color:#f4f0e6;
+  text-decoration:none;
+  font-size:11px;
+  font-weight:650;
+}
+.utility__shipping-offer svg{
+  width:17px;
+  height:17px;
+  flex:none;
+  fill:none;
+  stroke:#d6ae44;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.utility__shipping-offer b{color:#e4bf58;font-weight:850}
+.utility__shipping-offer small{
+  margin-inline-start:8px;
+  padding-inline-start:11px;
+  border-inline-start:1px solid rgba(228,191,88,.35);
+  color:#d8d1c1;
+  font-size:10px;
+}
+.utility__shipping-offer:hover small{text-decoration:underline;text-underline-offset:3px}
+
+.hero__visual{display:block;text-decoration:none}
+.product-card__media-link{display:block;cursor:pointer}
+.product-card__media-link-hint{
+  position:absolute;
+  left:14px;
+  bottom:14px;
+  z-index:3;
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  padding:8px 10px;
+  background:rgba(20,19,16,.88);
+  color:#f7f3ea;
+  font-size:10px;
+  font-weight:800;
+  opacity:0;
+  transform:translateY(6px);
+  transition:opacity .22s ease,transform .22s var(--ease);
+}
+.product-card__media-link-hint b{color:#e4bf58;font-size:14px;line-height:1}
+.product-card__media-link:hover .product-card__media-link-hint,
+.product-card__media-link:focus-visible .product-card__media-link-hint{opacity:1;transform:none}
+@media(max-width:760px){
+  .utility{height:36px}
+  .utility .utility__inner{padding-inline:10px}
+  .utility__shipping-offer{min-height:36px;gap:7px;font-size:10px;white-space:nowrap}
+  .utility__shipping-offer svg{width:15px;height:15px}
+  .utility__shipping-offer small{display:none}
+  .product-card__media-link-hint{opacity:1;transform:none;padding:6px 8px;font-size:9px}
+}
+
 /* Currency always reads as 349 ₪ visually, with the symbol on the left. */
 .price-offer__main strong,
 .price-offer__main del,
