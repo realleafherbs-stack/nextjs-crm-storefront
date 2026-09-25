@@ -34,7 +34,6 @@ describe("getProducts", () => {
       image: "/assets/products/at-570-single-v2.webp",
       images: [
         "/assets/products/at-570-single-v2.webp",
-        "/assets/barbershop/at-570-barbershop.jpg",
         "/assets/barbershop/at-570-action.jpg",
       ],
     });

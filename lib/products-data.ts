@@ -32,7 +32,6 @@ export const products: StoreProduct[] = [
     image: "/assets/products/at-799-single.jpg",
     images: [
       "/assets/products/at-799-single.jpg",
-      "/assets/barbershop/at-799-barbershop.jpg",
       "/assets/barbershop/at-799-action.jpg",
     ],
     cardFeatures: ["9,000 סל״ד", "להב DLC", "עד 360 דקות"],
@@ -49,7 +48,6 @@ export const products: StoreProduct[] = [
     image: "/assets/products/at-599-official-clean.jpg",
     images: [
       "/assets/products/at-599-official-clean.jpg",
-      "/assets/barbershop/at-599-barbershop.jpg",
       "/assets/barbershop/at-599-action-v2.png",
     ],
     cardFeatures: ["להב T", "מסך דיגיטלי", "4 מסרקים"],
@@ -66,7 +64,6 @@ export const products: StoreProduct[] = [
     image: "/assets/products/at-158-single-v2.webp",
     images: [
       "/assets/products/at-158-single-v2.webp",
-      "/assets/barbershop/at-158-barbershop.jpg",
       "/assets/barbershop/at-158-action-v2.jpg",
     ],
     cardFeatures: ["4 מסרקים", "טעינת USB", "לכל המשפחה"],
@@ -83,7 +80,6 @@ export const products: StoreProduct[] = [
     image: "/assets/products/at-735-single-v2.webp",
     images: [
       "/assets/products/at-735-single-v2.webp",
-      "/assets/barbershop/at-735-barbershop.jpg",
       "/assets/barbershop/at-735-action.jpg",
     ],
     cardFeatures: ["גוף מתכת", "מסך דיגיטלי", "5 מסרקים"],
@@ -100,7 +96,6 @@ export const products: StoreProduct[] = [
     image: "/assets/products/at-570-single-v2.webp",
     images: [
       "/assets/products/at-570-single-v2.webp",
-      "/assets/barbershop/at-570-barbershop.jpg",
       "/assets/barbershop/at-570-action.jpg",
     ],
     cardFeatures: ["להב T", "מסרקי 1/2/3 מ״מ", "בסיס כלול"],
@@ -117,7 +112,6 @@ export const products: StoreProduct[] = [
     image: "/assets/products/gt-667-single-v2.webp",
     images: [
       "/assets/products/gt-667-single-v2.webp",
-      "/assets/barbershop/gt-667-barbershop.jpg",
       "/assets/barbershop/gt-667-action.jpg",
     ],
     cardFeatures: ["2 ראשי גילוח", "גימור נקי", "ניקוי קל"],
