@@ -44,10 +44,15 @@ export default function ProductCard({ product, featured = false }: { product: St
 
   return (
     <article className={`product-card${featured ? " product-card--feature" : ""}`} data-category={product.category.slug}>
-      <div className="product-card__media">
+      <Link
+        className="product-card__media product-card__media-link"
+        href={`/shop/${product.handle}`}
+        aria-label={`לצפייה ב־${product.name}`}
+      >
         {product.badge && <span className="tag">{product.badge}</span>}
         <img className="product-shot" src={product.image} loading="lazy" decoding="async" alt={product.name} />
-      </div>
+        <span className="product-card__media-link-hint" aria-hidden="true">לצפייה בדגם <b>←</b></span>
+      </Link>
       <div className="product-card__body">
         <div className="product-card__intro">
           <small>{product.handle.toUpperCase()} · {product.category.name}</small>

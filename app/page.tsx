@@ -6,6 +6,7 @@ import UtilityBar from "./components/UtilityBar";
 import ProductCard from "./components/ProductCard";
 import { getProducts } from "../lib/products";
 import { getContent, c } from "../lib/content";
+import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_RATE } from "../lib/constants";
 
 export async function generateMetadata(): Promise<Metadata> {
   const content = await getContent();
@@ -24,6 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HomePage() {
   const [products, content] = await Promise.all([getProducts(), getContent()]);
   const featured = products.find((p) => p.handle === "at-799") ?? products[0];
+  const heroProduct = products.find((p) => p.handle === "at-735") ?? featured;
   const heroHeading = content["homepage.hero_heading"];
   const heroSubheading = content["homepage.hero_subheading"];
   const heroImage = c(content, "homepage.hero_image", "/hero-home.jpg");
@@ -48,7 +50,11 @@ export default async function HomePage() {
                 <Link className="button button--ghost" href="/compare">השוואת דגמים</Link>
               </div>
             </div>
-            <div className="hero__visual" role="img" aria-label="מכונת תספורת מקצועית HTC בסביבת ברברשופ"></div>
+            {heroProduct ? (
+              <Link className="hero__visual" href={`/shop/${heroProduct.handle}`} aria-label={`לצפייה ב־${heroProduct.name}`} />
+            ) : (
+              <div className="hero__visual" role="img" aria-label="מכונת תספורת מקצועית HTC בסביבת ברברשופ"></div>
+            )}
           </div>
         </section>
 
@@ -62,6 +68,19 @@ export default async function HomePage() {
           </div>
         </section>
 
+        <section className="products section" id="products">
+          <div className="shell">
+            <div className="section-heading section-heading--center">
+              <div><h2>בחרו את הדגם שמתאים לכם</h2><p><b>{products.length} דגמים.</b> משלוח ב־₪{STANDARD_SHIPPING_RATE} · חינם מ־₪{FREE_SHIPPING_THRESHOLD}.</p><i></i></div>
+            </div>
+            <div className="product-grid">
+              {products.map((product) => (
+                <ProductCard key={product.id} product={product} featured={product.handle === "at-799"} />
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="global-band" id="about">
           <div className="shell global-band__grid">
             <div className="global-band__map">
@@ -72,19 +91,6 @@ export default async function HomePage() {
               <h2>HTC</h2>
               <p>מכונות תספורת וגילוח לשימוש ביתי ומקצועי — עם ביצועים אמינים ושירות מקומי.</p>
               <a href="#products">לצפייה בדגמים</a>
-            </div>
-          </div>
-        </section>
-
-        <section className="products section" id="products">
-          <div className="shell">
-            <div className="section-heading section-heading--center">
-              <div><h2>בחרו את הדגם שמתאים לכם</h2><p><b>{products.length} דגמים.</b> פתרון לכל צורך.</p><i></i></div>
-            </div>
-            <div className="product-grid">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} featured={product.handle === "at-799"} />
-              ))}
             </div>
           </div>
         </section>
