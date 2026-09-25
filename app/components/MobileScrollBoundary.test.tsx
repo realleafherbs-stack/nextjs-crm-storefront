@@ -55,6 +55,22 @@ describe("MobileScrollBoundary", () => {
     expect(pastBottom.defaultPrevented).toBe(true);
   });
 
+  it("blocks bottom overscroll when Safari's visual viewport is shorter than the root scroller", () => {
+    Object.defineProperty(window, "innerHeight", { configurable: true, value: 720 });
+    Object.defineProperty(document.documentElement, "clientHeight", {
+      configurable: true,
+      value: 800,
+    });
+    document.documentElement.scrollTop = 1_200;
+    render(<MobileScrollBoundary />);
+
+    document.body.dispatchEvent(touchEvent("touchstart", 360));
+    const pastBottom = touchEvent("touchmove", 300);
+    document.body.dispatchEvent(pastBottom);
+
+    expect(pastBottom.defaultPrevented).toBe(true);
+  });
+
   it("keeps normal page scrolling and nested scroll areas working", () => {
     render(<MobileScrollBoundary />);
 
