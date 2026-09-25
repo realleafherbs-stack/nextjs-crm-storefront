@@ -44,7 +44,8 @@ describe("CheckoutPage order flow", () => {
 
     expect(details?.open).toBe(true);
     expect(screen.getByText(/HTC Glide - מגלח חשמלי עם 2 ראשי גילוח/)).not.toBeNull();
-    expect(screen.getAllByText("₪148.00").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("₪158.00").length).toBeGreaterThan(0);
+    expect(screen.getByText("₪39.00")).not.toBeNull();
   });
 
   it("does not distract customers with coupon controls during checkout", () => {

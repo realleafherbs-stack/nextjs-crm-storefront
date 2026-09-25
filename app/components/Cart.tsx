@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart, FREE_SHIPPING_THRESHOLD } from "../context/CartContext";
-import { formatPrice } from "../../lib/constants";
+import { formatPrice, STANDARD_SHIPPING_RATE } from "../../lib/constants";
 
 export default function Cart() {
   const { items, total, count, isPanelOpen, closePanel, removeItem, updateQuantity } = useCart();
@@ -65,7 +65,7 @@ export default function Cart() {
           <button type="button" onClick={() => { closePanel(); router.push("/cart"); }}>
             להמשך ההזמנה <span>←</span>
           </button>
-          <small>משלוח חינם בקנייה מעל ₪{FREE_SHIPPING_THRESHOLD}</small>
+          <small>משלוח ב־₪{STANDARD_SHIPPING_RATE} · חינם מ־₪{FREE_SHIPPING_THRESHOLD}</small>
         </div>
       </aside>
       <button className="scrim" aria-label="סגירה" hidden={!isPanelOpen} onClick={closePanel}></button>

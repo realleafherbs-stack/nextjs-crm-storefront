@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useCart, FREE_SHIPPING_THRESHOLD } from "../context/CartContext";
-import { formatPrice } from "../../lib/constants";
+import { useCart } from "../context/CartContext";
+import { calculateShipping, formatPrice } from "../../lib/constants";
 
 export default function CartPage() {
   const { items, total, removeItem, updateQuantity } = useCart();
   const router = useRouter();
-  const shipping = total === 0 || total >= FREE_SHIPPING_THRESHOLD ? 0 : 29;
+  const shipping = calculateShipping(total);
 
   return (
     <>
