@@ -1,4 +1,9 @@
 export const FREE_SHIPPING_THRESHOLD = 299;
+export const STANDARD_SHIPPING_RATE = 39;
+
+export function calculateShipping(orderTotal: number): number {
+  return orderTotal <= 0 || orderTotal >= FREE_SHIPPING_THRESHOLD ? 0 : STANDARD_SHIPPING_RATE;
+}
 
 // Currency arithmetic (subtraction/addition on floats sourced from CRM) can
 // produce results like 27.310000000000002 — always render exactly 2 decimals.

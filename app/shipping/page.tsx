@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LegalPageLayout from "../components/LegalPageLayout";
+import { FREE_SHIPPING_THRESHOLD, STANDARD_SHIPPING_RATE } from "../../lib/constants";
 
 export const metadata: Metadata = {
   title: "משלוחים והחזרות | HTC ישראל",
@@ -27,7 +28,7 @@ export default function ShippingPage() {
       </section>
       <section id="cost">
         <h2>עלות משלוח</h2>
-        <p>עלות המשלוח תוצג בסל לפני התשלום. הזמנות מעל הסכום המצוין באתר עשויות להיות זכאיות למשלוח חינם בהתאם למבצע הפעיל.</p>
+        <p>משלוח עד הבית עולה ₪{STANDARD_SHIPPING_RATE}. בקנייה מ־₪{FREE_SHIPPING_THRESHOLD} המשלוח חינם. העלות המדויקת מוצגת בסל ובקופה לפני התשלום.</p>
       </section>
       <section id="tracking">
         <h2>מעקב אחר הזמנה</h2>

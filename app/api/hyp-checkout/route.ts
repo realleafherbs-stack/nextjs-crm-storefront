@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stageCheckoutIntent } from "../../../lib/orders";
 import { getProducts } from "../../../lib/products";
-import { FREE_SHIPPING_THRESHOLD, roundCurrency } from "../../../lib/constants";
+import { calculateShipping, roundCurrency } from "../../../lib/constants";
 
 export interface CheckoutItem {
   id: string;
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
     couponCode = result.code;
   }
 
-  const shipping = subtotal === 0 || subtotal - discount >= FREE_SHIPPING_THRESHOLD ? 0 : 29;
+  const shipping = calculateShipping(subtotal - discount);
   const amount = roundCurrency(Math.max(0, subtotal - discount) + shipping);
 
   // Generated server-side — never trust a client-supplied order id.

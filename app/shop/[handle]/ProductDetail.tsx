@@ -6,7 +6,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { useCart } from "../../context/CartContext";
 import { WARRANTY_FAQ_ANSWER, type ProductContent } from "../../../lib/product-content";
 import type { StoreProduct } from "../../../lib/products-data";
-import { FREE_SHIPPING_THRESHOLD, formatPrice } from "../../../lib/constants";
+import { FREE_SHIPPING_THRESHOLD, formatPrice, STANDARD_SHIPPING_RATE } from "../../../lib/constants";
 
 const noteIcons = [
   <svg key="0" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 17h6"/></svg>,
@@ -131,7 +131,7 @@ export default function ProductDetail({
               <small>מחיר השקה · <del>₪{formatPrice(content.compareAtPrice)}</del></small>
               <strong>₪{formatPrice(product.price)}</strong>
               <em>חיסכון ₪{formatPrice(savings)}</em>
-              <p>המחיר כולל מע״מ · משלוח חינם בקנייה מעל ₪{FREE_SHIPPING_THRESHOLD}</p>
+              <p>המחיר כולל מע״מ · משלוח ב־₪{STANDARD_SHIPPING_RATE} · חינם מ־₪{FREE_SHIPPING_THRESHOLD}</p>
             </span>
           </div>
           <div className="product-quantity">

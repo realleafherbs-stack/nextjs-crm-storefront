@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useCart, FREE_SHIPPING_THRESHOLD } from "../context/CartContext";
-import { formatPrice } from "../../lib/constants";
+import { useCart } from "../context/CartContext";
+import { calculateShipping, formatPrice } from "../../lib/constants";
 
 type Step = "shipping" | "payment";
 
@@ -18,7 +18,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
-  const shipping = total === 0 || total >= FREE_SHIPPING_THRESHOLD ? 0 : 29;
+  const shipping = calculateShipping(total);
   const finalTotal = total + shipping;
 
   const [form, setForm] = useState({
