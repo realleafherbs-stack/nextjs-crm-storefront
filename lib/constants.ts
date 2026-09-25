@@ -1,4 +1,4 @@
-export const FREE_SHIPPING_THRESHOLD = 299;
+export const FREE_SHIPPING_THRESHOLD = 249;
 export const STANDARD_SHIPPING_RATE = 39;
 
 export function calculateShipping(orderTotal: number): number {

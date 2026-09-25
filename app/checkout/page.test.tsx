@@ -7,7 +7,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 vi.mock("../components/Navbar", () => ({ default: () => null }));
 vi.mock("../components/Footer", () => ({ default: () => null }));
 vi.mock("../context/CartContext", () => ({
-  FREE_SHIPPING_THRESHOLD: 299,
+  FREE_SHIPPING_THRESHOLD: 249,
   useCart: () => ({
     items: [
       {
