@@ -7,7 +7,7 @@ export default function UtilityBar() {
       <div className="shell utility__inner">
         <Link className="utility__shipping-offer" href="/shipping">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v10H3z"/><path d="M14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></svg>
-          <span>משלוח עד הבית ב־₪{STANDARD_SHIPPING_RATE} · <b>חינם מ־₪{FREE_SHIPPING_THRESHOLD}</b></span>
+          <span>משלוח ב־₪{STANDARD_SHIPPING_RATE} · <b>משלוח חינם בקנייה מעל ₪{FREE_SHIPPING_THRESHOLD}</b></span>
           <small aria-hidden="true">לפרטים</small>
         </Link>
       </div>
