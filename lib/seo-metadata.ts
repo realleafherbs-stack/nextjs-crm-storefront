@@ -304,6 +304,7 @@ export function buildSitemapEntries(
   const pages: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, changeFrequency: "weekly", priority: 1 },
     { url: `${baseUrl}/shop`, changeFrequency: "daily", priority: 0.9 },
+    { url: `${baseUrl}/business`, changeFrequency: "monthly", priority: 0.6 },
     { url: `${baseUrl}/blog`, changeFrequency: "weekly", priority: 0.75 },
     { url: `${baseUrl}/compare`, changeFrequency: "weekly", priority: 0.7 },
     { url: `${baseUrl}/contact`, changeFrequency: "monthly", priority: 0.5 },

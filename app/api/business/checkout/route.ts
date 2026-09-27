@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { businessCrm, type BusinessDeliveryInput, type BusinessOrderLine } from '../../../../lib/business-crm'
-import { businessRouteError, requireCurrentBusinessSession } from '../_shared'
+import { businessPrivateHeaders, businessRouteError, requireCurrentBusinessSession } from '../_shared'
 
 function readText(value: unknown, required = false) {
   if (value === undefined && !required) return undefined
@@ -52,13 +52,13 @@ async function createHypPaymentUrl(orderId: string, amount: number) {
 
 export async function POST(request: NextRequest) {
   const input = readCheckout(await request.json().catch(() => null))
-  if (!input) return NextResponse.json({ error: 'פרטי ההזמנה אינם תקינים' }, { status: 400 })
+  if (!input) return NextResponse.json({ error: 'פרטי ההזמנה אינם תקינים' }, { status: 400, headers: businessPrivateHeaders })
   try {
     const session = await requireCurrentBusinessSession()
     const orderId = `HTB-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`
     const staged = await businessCrm.stageBusinessCheckout(session.subject, orderId, input.lines, input.delivery)
     const paymentUrl = await createHypPaymentUrl(staged.orderId, staged.amount)
-    return NextResponse.json({ orderId: staged.orderId, amount: staged.amount, paymentUrl }, { headers: { 'Cache-Control': 'private, no-store' } })
+    return NextResponse.json({ orderId: staged.orderId, amount: staged.amount, paymentUrl }, { headers: businessPrivateHeaders })
   } catch (error) {
     return businessRouteError(error)
   }

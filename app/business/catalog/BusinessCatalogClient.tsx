@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import BusinessProductCard, { type BusinessCatalogViewItem } from '../../components/BusinessProductCard'
+import { trackBusinessEvent } from '../../../lib/business-analytics'
 import { useBusinessCart } from '../../../lib/business-cart'
 import type { BusinessCatalogItem } from '../../../lib/business-crm'
 
@@ -18,7 +19,10 @@ export default function BusinessCatalogClient({ catalog: providedCatalog }: { ca
         if (!response.ok) throw new Error(response.status === 401 || response.status === 403 ? 'נדרש אישור לחשבון עסקי' : 'לא ניתן לטעון את הקטלוג העסקי')
         return response.json() as Promise<{ items: BusinessCatalogItem[] }>
       })
-      .then(({ items }) => setCatalog(items))
+      .then(({ items }) => {
+        setCatalog(items)
+        trackBusinessEvent('b2b_catalog_view')
+      })
       .catch((reason) => setError(reason instanceof Error ? reason.message : 'לא ניתן לטעון את הקטלוג העסקי'))
   }, [providedCatalog])
 

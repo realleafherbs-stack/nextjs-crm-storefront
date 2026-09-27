@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
-import { businessRouteError, requireCurrentBusinessSession } from '../_shared'
+import { businessPrivateHeaders, businessRouteError, requireCurrentBusinessSession } from '../_shared'
 
 export async function GET() {
   try {
     const session = await requireCurrentBusinessSession()
-    return NextResponse.json(session, { headers: { 'Cache-Control': 'private, no-store' } })
+    return NextResponse.json(session, { headers: businessPrivateHeaders })
   } catch (error) {
     return businessRouteError(error)
   }

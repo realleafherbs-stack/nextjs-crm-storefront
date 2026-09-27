@@ -12,8 +12,9 @@ it("serves robots rules that advertise the live sitemap", async () => {
   const previousSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
   process.env.NEXT_PUBLIC_SITE_URL = "https://nextjs-crm-storefront.vercel.app";
   try {
+    const generalRule = robots().rules.find((rule) => rule.userAgent === "*");
+    expect(generalRule).toMatchObject({ userAgent: "*", allow: "/" });
     expect(robots()).toMatchObject({
-      rules: expect.arrayContaining([{ userAgent: "*", allow: "/" }]),
       sitemap: "https://www.htcpro.co.il/sitemap.xml",
       host: "https://www.htcpro.co.il",
     });
