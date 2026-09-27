@@ -12,6 +12,7 @@ const navLinks = [
   { href: "/blog", label: "מדריכים" },
   { href: "/#service", label: "אחריות ושירות" },
   { href: "/contact", label: "צור קשר" },
+  { href: "/business", label: "לעסקים" },
 ];
 
 export default function Navbar() {
