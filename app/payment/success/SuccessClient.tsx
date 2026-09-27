@@ -6,7 +6,7 @@ import { sendGTMEvent } from "@next/third-parties/google";
 import { useCart } from "../../context/CartContext";
 import { formatPrice } from "../../../lib/constants";
 
-export default function SuccessClient({ orderId, amount }: { orderId: string; amount: string }) {
+export default function SuccessClient({ orderId, amount, verified }: { orderId: string; amount: string; verified: boolean }) {
   const { items, total, hydrated, clearCart } = useCart();
   const fired = useRef(false);
 
@@ -15,41 +15,37 @@ export default function SuccessClient({ orderId, amount }: { orderId: string; am
     // (per React's child-before-parent effect ordering) runs AFTER this
     // component's effect on first mount — reading items/total here without
     // waiting for hydration would report an empty items array and value=0.
-    if (!hydrated || fired.current) return;
+    if (!hydrated || !verified || !orderId || fired.current) return;
     fired.current = true;
 
-    // Backup — the server-side finalize in page.tsx's initial load is the
-    // primary path, but if that request never completed (browser closed
-    // mid-redirect, etc.), this fires once the page actually renders.
-    // Idempotent server-side.
-    if (orderId) {
-      fetch("/api/confirm-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId }),
-      }).catch(() => {});
-
-      const orderTotal = Number(amount) || total;
-
-      sendGTMEvent({ ecommerce: null });
-      sendGTMEvent({
-        event: "purchase",
-        ecommerce: {
-          transaction_id: orderId,
-          currency: "ILS",
-          value: orderTotal,
-          items: items.map((i) => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.quantity })),
-        },
-      });
-      // Meta CAPI Purchase is sent server-side, from page.tsx, in the same
-      // request that finalizes the order — not from here — so it doesn't
-      // depend on the customer's browser staying open long enough to run
-      // this effect. See page.tsx for details.
-    }
+    const orderTotal = Number(amount) || total;
+    sendGTMEvent({ ecommerce: null });
+    sendGTMEvent({
+      event: "purchase",
+      ecommerce: {
+        transaction_id: orderId,
+        currency: "ILS",
+        value: orderTotal,
+        items: items.map((i) => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.quantity })),
+      },
+    });
 
     clearCart();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated]);
+  }, [hydrated, verified, orderId]);
+
+  if (!verified) {
+    return (
+      <div className="payment-result__card">
+        <div className="payment-result__icon payment-result__icon--failure">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+        </div>
+        <h1>לא נמצא אישור תשלום</h1>
+        <p>כדי להגן על ההזמנה, עמוד זה מוצג רק לאחר אימות מאובטח מול חברת הסליקה.</p>
+        <div className="payment-result__actions"><Link className="button button--gold" href="/cart">חזרה לסל</Link></div>
+      </div>
+    );
+  }
 
   return (
     <div className="payment-result__card">

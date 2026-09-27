@@ -154,7 +154,9 @@ export async function POST(req: NextRequest) {
     PageLang: "HEB",
     sendemail: "True",
     MoreData: "True",
-    SuccessUrl: `${siteUrl}/payment/success`,
+    // HYP returns here first so the server can verify its signature and the
+    // staged order total before any CRM order, invoice or receipt is created.
+    SuccessUrl: `${siteUrl}/api/hyp-return`,
     ErrorUrl: `${siteUrl}/payment/failure`,
   });
 

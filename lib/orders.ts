@@ -35,21 +35,24 @@ export interface OrderPayload {
   items: OrderItem[];
 }
 
-async function postToCrm(path: string, body?: unknown): Promise<Record<string, unknown> | null> {
+async function requestCrm(
+  path: string,
+  options: { method?: 'GET' | 'POST'; body?: unknown } = {},
+): Promise<Record<string, unknown> | null> {
   const url = `${process.env.CRM_URL}/api/${process.env.CRM_SITE_SLUG}${path}`;
   const attempts = 3;
 
   for (let i = 0; i < attempts; i++) {
     try {
       const res = await fetch(url, {
-        method: "POST",
+        method: options.method ?? "POST",
         headers: {
           "Content-Type": "application/json",
           "x-api-key": process.env.CRM_API_KEY!,
         },
         cache: "no-store",
         signal: AbortSignal.timeout(10000),
-        ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+        ...(options.body !== undefined ? { body: JSON.stringify(options.body) } : {}),
       });
       if (res.ok) return await res.json().catch(() => ({}));
     } catch {
@@ -67,13 +70,42 @@ export interface FinalizedOrder {
   customerPhone: string;
 }
 
-export async function stageCheckoutIntent(orderId: string, payload: OrderPayload): Promise<boolean> {
-  if (!ORDER_ID_PATTERN.test(orderId)) return false;
-  return (await postToCrm("/checkout-intents", { id: orderId, payload })) !== null;
+export interface FinalizeOrderResult {
+  order: FinalizedOrder | null;
+  already: boolean;
 }
 
-export async function finalizeOrder(orderId: string): Promise<FinalizedOrder | null> {
+export async function stageCheckoutIntent(orderId: string, payload: OrderPayload): Promise<boolean> {
+  if (!ORDER_ID_PATTERN.test(orderId)) return false;
+  return (await requestCrm("/checkout-intents", { body: { id: orderId, payload } })) !== null;
+}
+
+export interface StagedCheckoutIntent {
+  orderId: string;
+  amount: number;
+}
+
+export interface VerifiedPaymentAudit {
+  orderId: string;
+  amount: number;
+  transactionId: string | null;
+  approvalCode: string | null;
+}
+
+export async function getStagedCheckoutIntent(orderId: string): Promise<StagedCheckoutIntent | null> {
   if (!ORDER_ID_PATTERN.test(orderId)) return null;
-  const result = await postToCrm(`/checkout-intents/${encodeURIComponent(orderId)}/finalize`);
-  return (result?.order as FinalizedOrder | undefined) ?? null;
+  const result = await requestCrm(`/checkout-intents/${encodeURIComponent(orderId)}`, { method: 'GET' });
+  const amount = result?.total;
+  if (typeof amount !== 'number' || !Number.isFinite(amount)) return null;
+  return { orderId, amount };
+}
+
+export async function finalizeOrder(orderId: string, verifiedPayment: VerifiedPaymentAudit): Promise<FinalizeOrderResult | null> {
+  if (!ORDER_ID_PATTERN.test(orderId) || verifiedPayment.orderId !== orderId) return null;
+  const result = await requestCrm(`/checkout-intents/${encodeURIComponent(orderId)}/finalize`, { body: { verifiedPayment } });
+  if (!result || result.ok !== true) return null;
+  return {
+    already: result.already === true,
+    order: (result?.order as FinalizedOrder | undefined) ?? null,
+  };
 }
