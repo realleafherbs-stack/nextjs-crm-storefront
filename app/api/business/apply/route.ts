@@ -1,0 +1,43 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { businessCrm } from '../../../../lib/business-crm'
+import { businessRouteError } from '../_shared'
+
+const businessTypes = new Set(['SALON', 'BARBER', 'RETAILER', 'DISTRIBUTOR', 'OTHER'])
+
+function readString(value: unknown, required = false): string | undefined {
+  if (value === undefined && !required) return undefined
+  if (typeof value !== 'string' || !value.trim() || value.length > 500) return undefined
+  return value.trim()
+}
+
+export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => null)
+  if (!body || typeof body !== 'object') return NextResponse.json({ error: 'פרטי העסק אינם תקינים' }, { status: 400 })
+  const value = body as Record<string, unknown>
+  const businessName = readString(value.businessName, true)
+  const contactName = readString(value.contactName, true)
+  const email = readString(value.email, true)
+  const phone = readString(value.phone, true)
+  const city = readString(value.city, true)
+  const businessType = typeof value.businessType === 'string' && businessTypes.has(value.businessType) ? value.businessType : undefined
+  if (!businessName || !contactName || !email || !phone || !city || !businessType) {
+    return NextResponse.json({ error: 'יש למלא את כל פרטי העסק הנדרשים' }, { status: 400 })
+  }
+  try {
+    const result = await businessCrm.apply({
+      businessName,
+      contactName,
+      email,
+      phone,
+      city,
+      businessType,
+      businessIdentifier: readString(value.businessIdentifier),
+      website: readString(value.website),
+      notes: readString(value.notes),
+      source: 'htc-business-site',
+    })
+    return NextResponse.json({ ok: true, applicationId: result.applicationId })
+  } catch (error) {
+    return businessRouteError(error)
+  }
+}
