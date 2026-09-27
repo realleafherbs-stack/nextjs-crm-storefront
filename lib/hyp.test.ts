@@ -54,4 +54,10 @@ describe('HYP payment verification', () => {
     expect(decodePaymentReceipt(encodePaymentReceipt({ orderId: 'HT-1', amount: 99 }))).toEqual({ orderId: 'HT-1', amount: 99 })
     expect(decodePaymentReceipt('{"Order":"HT-1","Amount":"99"}')).toBeNull()
   })
+
+  it('marks a verified business receipt so it cannot clear the retail cart', () => {
+    expect(decodePaymentReceipt(encodePaymentReceipt({ orderId: 'HTB-1790000000000-a1b2c3d4', amount: 118, channel: 'business' }))).toEqual({
+      orderId: 'HTB-1790000000000-a1b2c3d4', amount: 118, channel: 'business',
+    })
+  })
 })

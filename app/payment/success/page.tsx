@@ -11,7 +11,7 @@ export default async function PaymentSuccessPage() {
     <>
       <Navbar />
       <main id="main" className="payment-result">
-        <SuccessClient orderId={receipt?.orderId ?? ""} amount={receipt ? String(receipt.amount) : ""} verified={Boolean(receipt)} />
+        <SuccessClient orderId={receipt?.orderId ?? ""} amount={receipt ? String(receipt.amount) : ""} verified={Boolean(receipt)} business={receipt?.channel === 'business'} />
       </main>
       <Footer />
     </>

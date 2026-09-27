@@ -11,6 +11,7 @@ export type VerifiedHypPayment = {
 export type VerifiedPaymentReceipt = {
   orderId: string
   amount: number
+  channel?: 'business'
 }
 
 export class HypPaymentError extends Error {
@@ -24,17 +25,17 @@ export class HypPaymentError extends Error {
 }
 
 export function encodePaymentReceipt(receipt: VerifiedPaymentReceipt): string {
-  return encodeURIComponent(JSON.stringify({ v: 1, o: receipt.orderId, a: receipt.amount }))
+  return encodeURIComponent(JSON.stringify({ v: 1, o: receipt.orderId, a: receipt.amount, ...(receipt.channel ? { c: receipt.channel } : {}) }))
 }
 
 export function decodePaymentReceipt(value: string | undefined): VerifiedPaymentReceipt | null {
   if (!value) return null
   try {
-    const parsed = JSON.parse(decodeURIComponent(value)) as { v?: unknown; o?: unknown; a?: unknown }
-    if (parsed.v !== 1 || typeof parsed.o !== 'string' || !parsed.o || typeof parsed.a !== 'number' || !Number.isFinite(parsed.a) || parsed.a < 0) {
+    const parsed = JSON.parse(decodeURIComponent(value)) as { v?: unknown; o?: unknown; a?: unknown; c?: unknown }
+    if (parsed.v !== 1 || typeof parsed.o !== 'string' || !parsed.o || typeof parsed.a !== 'number' || !Number.isFinite(parsed.a) || parsed.a < 0 || (parsed.c !== undefined && parsed.c !== 'business')) {
       return null
     }
-    return { orderId: parsed.o, amount: Math.round((parsed.a + Number.EPSILON) * 100) / 100 }
+    return { orderId: parsed.o, amount: Math.round((parsed.a + Number.EPSILON) * 100) / 100, ...(parsed.c === 'business' ? { channel: 'business' as const } : {}) }
   } catch {
     return null
   }

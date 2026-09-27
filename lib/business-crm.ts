@@ -26,6 +26,40 @@ export type BusinessCatalogItem = {
   grossUnitPrice: number
 }
 
+export type BusinessDeliveryInput = {
+  name: string
+  email: string
+  phone: string
+  street: string
+  houseNumber: string
+  apartment?: string
+  city: string
+  notes?: string
+}
+
+export type BusinessOrderLine = { productId: string; quantity: number }
+
+export type BusinessOrderSummary = {
+  id: string
+  status: 'AWAITING_PAYMENT' | 'PAID' | 'FULFILLED' | 'CANCELLED' | 'PAYMENT_FAILED'
+  netSubtotal: number
+  vatAmount: number
+  grossTotal: number
+  createdAt: string
+  paidAt: string | null
+  items: Array<{
+    productId: string
+    productName: string
+    sku: string | null
+    quantity: number
+    netUnitPrice: number
+    grossUnitPrice: number
+    lineGrossTotal: number
+  }>
+}
+
+export const BUSINESS_ORDER_ID_PATTERN = /^HTB-\d{13}-[a-f0-9]{8}$/
+
 function config() {
   const crmUrl = process.env.CRM_URL
   const siteSlug = process.env.CRM_SITE_SLUG
@@ -79,6 +113,26 @@ export class BusinessCrmClient {
 
   getCatalog(subject: BusinessSubject) {
     return this.request<{ items: BusinessCatalogItem[] }>('/catalog', { method: 'POST', body: JSON.stringify({ subject }) })
+  }
+
+  stageBusinessCheckout(subject: BusinessSubject, orderId: string, lines: BusinessOrderLine[], delivery: BusinessDeliveryInput) {
+    return this.request<{ orderId: string; amount: number }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'stage', subject, orderId, lines, delivery }) })
+  }
+
+  getBusinessPaymentIntent(orderId: string) {
+    return this.request<{ orderId: string; amount: number }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'payment-intent', orderId }) })
+  }
+
+  finalizeBusinessOrder(orderId: string, verifiedPayment: { orderId: string; amount: number; transactionId: string | null; approvalCode: string | null }) {
+    return this.request<{ ok: true; already: boolean }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'finalize', orderId, verifiedPayment }) })
+  }
+
+  listBusinessOrders(subject: BusinessSubject) {
+    return this.request<{ orders: BusinessOrderSummary[] }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'list', subject }) })
+  }
+
+  reorderBusinessOrder(subject: BusinessSubject, orderId: string) {
+    return this.request<{ orderId: string; lines: BusinessOrderLine[] }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'reorder', subject, orderId }) })
   }
 }
 
