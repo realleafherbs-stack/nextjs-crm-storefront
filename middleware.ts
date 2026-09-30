@@ -23,7 +23,13 @@ export function middleware(request: NextRequest) {
   requestHeaders.delete("x-body-class");
   if (bodyClass) requestHeaders.set("x-body-class", bodyClass);
 
-  return NextResponse.next({ request: { headers: requestHeaders } });
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+  const privateBusinessPage = ["/business/catalog", "/business/cart", "/business/checkout", "/business/account"].some((path) => pathname === path || pathname.startsWith(`${path}/`));
+  if (pathname.startsWith("/api/business/") || privateBusinessPage) {
+    response.headers.set("Cache-Control", "private, no-store");
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  }
+  return response;
 }
 
 export const config = {
