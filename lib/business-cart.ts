@@ -123,27 +123,15 @@ export function useBusinessCart() {
   }, [])
 
   const addLine = useCallback((line: BusinessCartLine) => {
-    setLines((current) => {
-      const next = sanitizeBusinessCart([...current, line])
-      writeBusinessCart(next)
-      return next
-    })
+    setLines(addBusinessLine(line))
   }, [])
 
   const updateLine = useCallback((productId: string, quantity: number) => {
-    setLines((current) => {
-      const next = sanitizeBusinessCart(current.map((line) => line.productId === productId ? { productId, quantity } : line))
-      writeBusinessCart(next)
-      return next
-    })
+    setLines(updateBusinessLine(productId, quantity))
   }, [])
 
   const removeLine = useCallback((productId: string) => {
-    setLines((current) => {
-      const next = current.filter((line) => line.productId !== productId)
-      writeBusinessCart(next)
-      return next
-    })
+    setLines(removeBusinessLine(productId))
   }, [])
 
   return { lines, ready, addLine, updateLine, removeLine, replaceLines: persist }
