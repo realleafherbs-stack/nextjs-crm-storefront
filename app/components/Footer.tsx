@@ -19,7 +19,7 @@ export default function Footer() {
           <h3>המותג</h3>
           <Link href="/#about">HTC בעולם</Link>
           <Link href="/#one-pro">האיכות המקצועית</Link>
-          <Link href="/business">לשותפים עסקיים</Link>
+          <Link href="/business">לקוחות עסקיים</Link>
         </div>
         <div>
           <h3>שירות</h3>
