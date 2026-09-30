@@ -12,6 +12,13 @@ describe("mobile product footer layout", () => {
     expect(mobileFooterCss).not.toContain("html:has(body.product-template)");
   });
 
+  it("applies overscroll containment to Safari's body scrolling root", () => {
+    const marker = "/* Mobile footer end-state: keep Safari's root canvas dark beyond every footer. */";
+    const mobileFooterCss = css.slice(css.indexOf(marker));
+
+    expect(mobileFooterCss).toMatch(/body\s*\{[^}]*overscroll-behavior-y:\s*none[^}]*\}/s);
+  });
+
   it("keeps the footer as the document boundary above the fixed buy bar", () => {
     expect(css).toMatch(/body\.product-template\s*\{[^}]*padding-bottom:\s*0[^}]*background:\s*#070706[^}]*\}/s);
     expect(css).toMatch(/body\.product-template\s+\.footer\s*\{[^}]*padding-bottom:\s*calc\(94px\s*\+\s*env\(safe-area-inset-bottom\)\)[^}]*\}/s);
