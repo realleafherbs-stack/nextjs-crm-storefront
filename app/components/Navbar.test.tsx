@@ -14,6 +14,7 @@ vi.mock("next/navigation", () => ({
 afterEach(() => {
   cleanup();
   localStorage.clear();
+  vi.unstubAllGlobals();
 });
 
 beforeEach(() => {
@@ -50,4 +51,23 @@ it("shows the separate business cart in the header and keeps its item count in s
   fireEvent.click(screen.getByRole("button", { name: "הוסף עסקי" }));
 
   expect(await screen.findByRole("link", { name: "לסל העסקי, 2 פריטים" })).toBeTruthy();
+});
+
+it("shows the VAT-inclusive approved total beside the business cart", async () => {
+  navigationState.pathname = "/business/checkout";
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue({
+    ok: true,
+    json: async () => ({ items: [{ productId: "at-799", grossUnitPrice: 177 }] }),
+  }));
+
+  render(
+    <CartProvider>
+      <Navbar />
+      <BusinessCartAdder />
+    </CartProvider>,
+  );
+
+  fireEvent.click(screen.getByRole("button", { name: "הוסף עסקי" }));
+
+  expect(await screen.findByText("₪354.00")).toBeTruthy();
 });

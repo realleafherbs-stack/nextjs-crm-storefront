@@ -3933,6 +3933,23 @@ section[id]{scroll-margin-top:110px}
   .site-header .cart-button b{right:-1px}
 }
 
+/* Business buyers see both their item count and the current approved gross total. */
+.site-header .business-cart-button__total{
+  position:absolute;
+  top:50%;
+  left:54px;
+  transform:translateY(-50%);
+  direction:ltr;
+  color:oklch(89% .11 83);
+  font-size:12px;
+  font-weight:850;
+  line-height:1;
+  white-space:nowrap;
+}
+@media(max-width:700px){
+  .site-header .business-cart-button__total{display:none}
+}
+
 /* Header trust ribbon: a single, unbroken route to shipping details. */
 .utility{
   height:38px;
