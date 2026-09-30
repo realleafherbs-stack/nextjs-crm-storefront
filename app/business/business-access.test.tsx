@@ -3,11 +3,21 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { BusinessApplicationForm, requestBusinessReset } from './BusinessLandingClient'
+import BusinessLandingClient, { BusinessApplicationForm, requestBusinessReset } from './BusinessLandingClient'
 
 afterEach(() => cleanup())
 
 describe('business access journey', () => {
+  it('introduces direct importer purchasing with the HTC product visual', () => {
+    render(<BusinessLandingClient />)
+
+    expect(screen.getByRole('heading', { name: 'מחירי יבואן. מוצרים מקצועיים. הזמנה ישירה לעסק.' })).not.toBeNull()
+    expect(screen.getByText('פותחים חשבון עסקי ומקבלים גישה למחירים מיוחדים, מלאי זמין והזמנות במקום אחד.')).not.toBeNull()
+    expect(screen.getByRole('link', { name: 'פתיחת חשבון עסקי' }).getAttribute('href')).toBe('/business/apply')
+    expect(screen.getByRole('img', { name: 'מכונת תספורת מקצועית HTC' }).getAttribute('src')).toContain('at-799-barbershop.jpg')
+    expect(screen.getByText('מזמינים לעסק')).not.toBeNull()
+  })
+
   it('submits a valid business application and confirms manual review', async () => {
     const user = userEvent.setup()
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })))

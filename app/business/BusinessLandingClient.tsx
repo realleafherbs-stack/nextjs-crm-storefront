@@ -105,5 +105,27 @@ export function BusinessResetPasswordForm({ token }: { token: string }) {
 }
 
 export default function BusinessLandingClient() {
-  return <main className="business-landing"><section className="business-landing__hero"><p className="kicker">HTC PRO · יבואן לעסקים</p><h1>כלי עבודה מקצועיים.<br />תנאי יבואן לעסק שלך.</h1><p>חשבון עסקי מאושר מאפשר הזמנה ישירה של מכונות HTC, מחירון מותאם וניהול הזמנות במקום אחד.</p><div className="business-landing__actions"><Link href="/business/apply" className="button button--gold">בקשה לחשבון עסקי</Link><Link href="/business/login" className="button button--ghost">כניסה ללקוחות עסקיים</Link></div></section><section className="business-landing__steps"><article><b>01</b><h2>שולחים בקשה</h2><p>פרטי עסק קצרים — בלי התחייבות.</p></article><article><b>02</b><h2>אנחנו מאשרים</h2><p>היבואן בודק את הבקשה ומתאים מחירון.</p></article><article><b>03</b><h2>מזמינים בביטחון</h2><p>גישה מאובטחת לקטלוג עסקי ולהזמנות שלך.</p></article></section></main>
+  return (
+    <main className="business-landing">
+      <section className="business-landing__hero">
+        <div className="business-landing__content">
+          <p className="kicker">HTC PRO לעסקים</p>
+          <h1>מחירי יבואן. מוצרים מקצועיים. הזמנה ישירה לעסק.</h1>
+          <p>פותחים חשבון עסקי ומקבלים גישה למחירים מיוחדים, מלאי זמין והזמנות במקום אחד.</p>
+          <div className="business-landing__actions">
+            <Link href="/business/apply" className="button button--gold">פתיחת חשבון עסקי</Link>
+            <Link href="/business/login" className="button button--ghost">כניסה ללקוחות עסקיים</Link>
+          </div>
+        </div>
+        <figure className="business-landing__visual">
+          <img src="/assets/barbershop/at-799-barbershop.jpg" alt="מכונת תספורת מקצועית HTC" />
+        </figure>
+      </section>
+      <section className="business-landing__steps" aria-label="איך זה עובד">
+        <article><b>01</b><h2>פותחים חשבון</h2><p>כמה פרטים קצרים ומגישים בקשה.</p></article>
+        <article><b>02</b><h2>מקבלים אישור</h2><p>לאחר האישור נפתחת גישה למחירים העסקיים.</p></article>
+        <article><b>03</b><h2>מזמינים לעסק</h2><p>בוחרים מוצרים ומזמינים ישירות מהיבואן.</p></article>
+      </section>
+    </main>
+  )
 }
