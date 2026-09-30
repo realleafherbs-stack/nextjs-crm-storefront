@@ -4255,6 +4255,10 @@ section[id]{scroll-margin-top:110px}
     background:#070706;
     overscroll-behavior-y:none;
   }
+  body{
+    background:#070706;
+    overscroll-behavior-y:none;
+  }
   body.product-template{
     padding-bottom:0;
     background:#070706;
