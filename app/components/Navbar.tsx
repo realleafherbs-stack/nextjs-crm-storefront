@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCart } from "../context/CartContext";
+import { useBusinessCart } from "../../lib/business-cart";
 
 const navLinks = [
   { href: "/", label: "דף הבית" },
@@ -19,6 +20,9 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const { count, openPanel } = useCart();
   const pathname = usePathname();
+  const businessCart = useBusinessCart();
+  const isBusinessArea = pathname?.startsWith("/business");
+  const businessItemCount = businessCart.lines.reduce((total, line) => total + line.quantity, 0);
 
   return (
     <header className="site-header">
@@ -47,16 +51,28 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-        <button
-          className={`cart-button${count > 0 ? " has-items" : ""}`}
-          type="button"
-          aria-label={count ? `פתיחת סל הקניות, ${count} פריטים` : "פתיחת סל הקניות"}
-          onClick={openPanel}
-        >
-          <svg aria-hidden="true"><use href="#icon-bag" /></svg>
-          <span>סל</span>
-          <b>{count}</b>
-        </button>
+        {isBusinessArea ? (
+          <Link
+            className={`cart-button${businessItemCount > 0 ? " has-items" : ""}`}
+            href="/business/cart"
+            aria-label={`לסל העסקי, ${businessItemCount} פריטים`}
+          >
+            <svg aria-hidden="true"><use href="#icon-bag" /></svg>
+            <span>סל עסקי</span>
+            <b>{businessItemCount}</b>
+          </Link>
+        ) : (
+          <button
+            className={`cart-button${count > 0 ? " has-items" : ""}`}
+            type="button"
+            aria-label={count ? `פתיחת סל הקניות, ${count} פריטים` : "פתיחת סל הקניות"}
+            onClick={openPanel}
+          >
+            <svg aria-hidden="true"><use href="#icon-bag" /></svg>
+            <span>סל</span>
+            <b>{count}</b>
+          </button>
+        )}
       </div>
     </header>
   );

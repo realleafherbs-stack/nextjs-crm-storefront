@@ -81,7 +81,7 @@ export function BusinessCheckoutClient({ initialLines, initialCatalog }: { initi
         </div>
         {!lines.length && <p className="business-checkout__error">הסל העסקי ריק. יש לבחור מוצרים לפני המעבר לתשלום.</p>}
         {error && <p className="business-checkout__error" role="alert">{error}</p>}
-        <button className="button button--gold" type="submit" disabled={loading || !lines.length}>{loading ? 'מעבירים לתשלום…' : 'לתשלום מאובטח'}</button>
+        <button className="button button--gold" type="submit" disabled={loading || !lines.length}>{loading ? 'מעבירים לתשלום…' : 'לתשלום בכרטיס אשראי'}</button>
         <small className="business-checkout__secure">תשלום מאובטח באמצעות HYP.</small>
       </form>
     </div>

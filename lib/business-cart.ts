@@ -11,6 +11,7 @@ type BusinessCatalogTerm = {
 }
 
 export const BUSINESS_CART_STORAGE_KEY = 'htc-israel-b2b-cart-v1'
+export const BUSINESS_CART_UPDATED_EVENT = 'htc-israel-b2b-cart-updated'
 
 function storage(): Storage | null {
   return typeof window === 'undefined' ? null : window.localStorage
@@ -42,7 +43,11 @@ export function readBusinessCart(): BusinessCartLine[] {
 }
 
 export function writeBusinessCart(lines: BusinessCartLine[]) {
-  storage()?.setItem(BUSINESS_CART_STORAGE_KEY, JSON.stringify(sanitizeBusinessCart(lines)))
+  const target = storage()
+  if (!target) return
+  const sanitized = sanitizeBusinessCart(lines)
+  target.setItem(BUSINESS_CART_STORAGE_KEY, JSON.stringify(sanitized))
+  window.dispatchEvent(new CustomEvent(BUSINESS_CART_UPDATED_EVENT))
 }
 
 export function addBusinessLine(line: BusinessCartLine) {
@@ -97,8 +102,18 @@ export function useBusinessCart() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    setLines(readBusinessCart())
+    const sync = () => setLines(readBusinessCart())
+    const syncFromOtherTab = (event: StorageEvent) => {
+      if (event.key === BUSINESS_CART_STORAGE_KEY) sync()
+    }
+    sync()
     setReady(true)
+    window.addEventListener(BUSINESS_CART_UPDATED_EVENT, sync)
+    window.addEventListener('storage', syncFromOtherTab)
+    return () => {
+      window.removeEventListener(BUSINESS_CART_UPDATED_EVENT, sync)
+      window.removeEventListener('storage', syncFromOtherTab)
+    }
   }, [])
 
   const persist = useCallback((next: BusinessCartLine[]) => {

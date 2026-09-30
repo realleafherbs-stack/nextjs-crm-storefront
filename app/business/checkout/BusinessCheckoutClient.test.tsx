@@ -12,4 +12,5 @@ it('has no B2B coupon input and keeps the order summary above delivery fields on
 
   expect(screen.queryByLabelText(/קופון/)).toBeNull()
   expect(screen.getByText('פירוט הזמנה').compareDocumentPosition(screen.getByLabelText('עיר')) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  expect(screen.getByRole('button', { name: 'לתשלום בכרטיס אשראי' })).toBeTruthy()
 })
