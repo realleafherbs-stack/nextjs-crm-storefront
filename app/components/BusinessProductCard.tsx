@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useState } from 'react'
 import type { BusinessCatalogItem } from '../../lib/business-crm'
 
@@ -51,7 +52,7 @@ export default function BusinessProductCard({ product, onAdd }: { product: Busin
         <div className="business-quantity" aria-label={`כמות ${product.name}`}><button type="button" aria-label="הפחתת כמות" onClick={() => changeQuantity(-1)} disabled={quantity <= minimum}>−</button><output>{quantity}</output><button type="button" aria-label="הגדלת כמות" onClick={() => changeQuantity(1)} disabled={quantity >= maximum}>+</button></div>
         <button className="button button--gold" type="button" disabled={!available} onClick={() => { onAdd({ productId: product.productId, quantity }); setFeedback('נוסף לסל העסקי') }}>{available ? 'הוספה להזמנה' : 'לא זמין'}</button>
       </div>}
-      {feedback && <p className="business-product-card__feedback" role="status">{feedback}</p>}
+      {feedback && <p className="business-product-card__feedback" role="status"><span>{feedback}</span><Link href="/business/cart">לסל ולתשלום</Link></p>}
     </div>
   </article>
 }
