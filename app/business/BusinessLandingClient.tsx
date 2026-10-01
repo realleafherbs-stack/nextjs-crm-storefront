@@ -42,7 +42,7 @@ export function BusinessApplicationForm() {
   }
 
   return (
-    <form className="business-form" onSubmit={submit} noValidate>
+    <form className="business-form" onSubmit={submit}>
       <h1>בקשה לחשבון עסקי</h1>
       <p>הגישה נפתחת לאחר אישור ידני של היבואן. המחירון העסקי יופיע רק בחשבון מאושר.</p>
       <div className="business-form__grid">
@@ -52,7 +52,7 @@ export function BusinessApplicationForm() {
         <label>טלפון<input name="phone" type="tel" required autoComplete="tel" /></label>
         <label>סוג העסק<select name="businessType" required defaultValue=""><option value="" disabled>בחירה</option><option value="BARBER">ברבר / מספרה</option><option value="SALON">סלון יופי</option><option value="RETAILER">חנות</option><option value="DISTRIBUTOR">מפיץ</option><option value="OTHER">אחר</option></select></label>
         <label>עיר<input name="city" required autoComplete="address-level2" /></label>
-        <label>ע.מ. / ח.פ. <small>אופציונלי</small><input name="businessIdentifier" inputMode="numeric" /></label>
+        <label>ע.מ. / ח.פ. <small>חובה</small><input name="businessIdentifier" inputMode="numeric" required /></label>
         <label>אתר או אינסטגרם <small>אופציונלי</small><input name="website" type="url" /></label>
       </div>
       <label>הערה <small>אופציונלי</small><textarea name="notes" rows={3} /></label>

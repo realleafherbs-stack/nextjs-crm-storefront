@@ -19,8 +19,9 @@ export async function POST(request: NextRequest) {
   const email = readString(value.email, true)
   const phone = readString(value.phone, true)
   const city = readString(value.city, true)
+  const businessIdentifier = readString(value.businessIdentifier, true)
   const businessType = typeof value.businessType === 'string' && businessTypes.has(value.businessType) ? value.businessType : undefined
-  if (!businessName || !contactName || !email || !phone || !city || !businessType) {
+  if (!businessName || !contactName || !email || !phone || !city || !businessIdentifier || !businessType) {
     return NextResponse.json({ error: 'יש למלא את כל פרטי העסק הנדרשים' }, { status: 400 })
   }
   try {
@@ -31,7 +32,7 @@ export async function POST(request: NextRequest) {
       phone,
       city,
       businessType,
-      businessIdentifier: readString(value.businessIdentifier),
+      businessIdentifier,
       website: readString(value.website),
       notes: readString(value.notes),
       source: 'htc-business-site',
