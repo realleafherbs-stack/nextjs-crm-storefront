@@ -7,7 +7,13 @@ it("ships a complete Hebrew SEO content cluster with unique, indexable articles"
   expect(posts).toBeInstanceOf(Array);
   if (!Array.isArray(posts)) return;
 
-  expect(posts).toHaveLength(5);
+  expect(posts).toHaveLength(9);
+  expect(posts.map((post) => post.slug)).toEqual(expect.arrayContaining([
+    "hair-clipper-importer-israel",
+    "wholesale-clippers-for-barbershops",
+    "hairdressing-equipment-wholesale-clippers",
+    "hair-clippers-for-retailers-and-distributors",
+  ]));
   expect(new Set(posts.map((post) => post.slug)).size).toBe(posts.length);
   for (const post of posts) {
     expect(post.indexable).toBe(true);
@@ -34,6 +40,6 @@ it("lets a CRM article override its built-in version without hiding the rest of 
   const override = { ...fallbackBlogPosts[0], id: "crm-post", title: "כותרת מעודכנת מה-CRM" };
   const merged = mergeBlogPosts([override], fallbackBlogPosts);
 
-  expect(merged).toHaveLength(5);
+  expect(merged).toHaveLength(9);
   expect(merged.find((post) => post.slug === override.slug)).toMatchObject({ id: "crm-post", title: "כותרת מעודכנת מה-CRM" });
 });
