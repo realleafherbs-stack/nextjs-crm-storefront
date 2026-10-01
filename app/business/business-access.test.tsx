@@ -1,11 +1,15 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import BusinessLandingClient, { BusinessApplicationForm, requestBusinessReset } from './BusinessLandingClient'
 
-afterEach(() => cleanup())
+const { replace } = vi.hoisted(() => ({ replace: vi.fn() }))
+
+vi.mock('next/navigation', () => ({ useRouter: () => ({ replace }) }))
+
+afterEach(() => { cleanup(); replace.mockReset() })
 
 describe('business access journey', () => {
   it('introduces direct importer purchasing with the HTC product visual', () => {
@@ -18,7 +22,7 @@ describe('business access journey', () => {
     expect(screen.getByText('מזמינים לעסק')).not.toBeNull()
   })
 
-  it('submits a valid business application and confirms manual review', async () => {
+  it('takes an approved business-account application to its own confirmation page', async () => {
     const user = userEvent.setup()
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 })))
     render(<BusinessApplicationForm />)
@@ -32,7 +36,7 @@ describe('business access journey', () => {
     await user.type(screen.getByLabelText(/ע\.מ\. \/ ח\.פ\./), '515253763')
     await user.click(screen.getByRole('button', { name: 'שליחת בקשה' }))
 
-    expect(await screen.findByText(/הבקשה התקבלה/)).not.toBeNull()
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/business/application-received'))
     vi.unstubAllGlobals()
   })
 
