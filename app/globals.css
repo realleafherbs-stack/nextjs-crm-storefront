@@ -4710,3 +4710,5 @@ section[id]{scroll-margin-top:110px}
     transition:none!important;
   }
 }
+
+.product-manual,.business-product-card__manual{display:inline-flex;align-items:center;justify-content:center;width:max-content;min-height:42px;padding:0 16px;border:1px solid #b9a668;color:#27231b;background:#fffdf8;font-size:12px;font-weight:800;text-decoration:none}.product-manual{margin-top:12px}.business-product-card__manual{justify-self:start}.product-manual:hover,.business-product-card__manual:hover{background:#efe5be;color:#171715}
