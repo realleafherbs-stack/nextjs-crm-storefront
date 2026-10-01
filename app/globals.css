@@ -4712,3 +4712,15 @@ section[id]{scroll-margin-top:110px}
 }
 
 .product-manual,.business-product-card__manual{display:inline-flex;align-items:center;justify-content:center;width:max-content;min-height:42px;padding:0 16px;border:1px solid #b9a668;color:#27231b;background:#fffdf8;font-size:12px;font-weight:800;text-decoration:none}.product-manual{margin-top:12px}.business-product-card__manual{justify-self:start}.product-manual:hover,.business-product-card__manual:hover{background:#efe5be;color:#171715}
+
+/* Business cart clarity and thumbnail loading */
+.business-cart-summary{padding:16px 0 76px}.business-cart-summary__heading{align-items:center;margin-bottom:22px;padding-bottom:20px;border-bottom:1px solid #dcd5c9}.business-cart-summary__return{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 16px;border:1px solid #171715;background:#171715;color:#fffdf8;font-size:13px;font-weight:800;text-decoration:none;box-shadow:0 7px 16px rgba(23,23,21,.12);transition:transform .2s var(--ease),background .2s var(--ease)}.business-cart-summary__return svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}.business-cart-summary__return:hover{background:#b28c2d;border-color:#b28c2d;transform:translateY(-1px)}.business-cart-summary__lines article{contain:layout paint style;min-height:106px}.business-cart-summary__lines img{width:80px;height:80px;padding:6px;border:1px solid #e5ded1;background:#fffdf8;object-fit:contain}.business-cart-summary__remove{grid-column:1/-1;justify-self:center;display:grid;place-items:center;width:34px;height:34px;margin-top:6px;padding:0;border:1px solid #d8c9be;border-radius:50%;background:#fff9f5;color:#9a3d2d}.business-cart-summary__remove svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8}.business-cart-summary__remove:hover{border-color:#9a3d2d;background:#f7e7e2}
+
+@media(max-width:700px){
+  .reveal{opacity:1!important;transform:none!important;transition:none!important}
+  .business-cart-summary{padding:8px 0 58px}
+  .business-cart-summary__heading{align-items:stretch;gap:15px}
+  .business-cart-summary__return{width:100%}
+  .business-cart-summary__lines article{min-height:0}
+  .business-cart-summary__lines img{width:64px;height:64px}
+}
