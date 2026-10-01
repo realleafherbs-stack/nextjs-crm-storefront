@@ -36,6 +36,7 @@ export default function BusinessProductCard({ product, onAdd }: { product: Busin
   const [feedback, setFeedback] = useState<string | null>(null)
   const hasPrice = isWholesalerPriceVisible(product)
   const manual = getProductManual(product.handle)
+  const productHref = `/business/catalog/${encodeURIComponent(product.handle)}`
 
   function changeQuantity(direction: 1 | -1) {
     setQuantity((current) => validNextQuantity(current, direction, product))
@@ -43,13 +44,16 @@ export default function BusinessProductCard({ product, onAdd }: { product: Busin
 
   return <article className="business-product-card">
     <div className="business-product-card__media">
-      {product.image ? <img src={product.image} alt={product.imageAlt ?? product.name} loading="lazy" decoding="async" /> : <span>HTC</span>}
+      <Link href={productHref} className="business-product-card__media-link" aria-label={`פרטי ${product.name}`}>
+        {product.image ? <img src={product.image} alt={product.imageAlt ?? product.name} loading="lazy" decoding="async" /> : <span>HTC</span>}
+      </Link>
       <span className={available ? 'business-product-card__stock' : 'business-product-card__stock business-product-card__stock--empty'}>{available ? 'במלאי לעסקים' : 'לא זמין כרגע'}</span>
     </div>
     <div className="business-product-card__body">
-      <div><small>{product.sku ?? product.handle.toUpperCase()}</small><h2>{product.name}</h2></div>
+      <div><small>{product.sku ?? product.handle.toUpperCase()}</small><h2><Link href={productHref}>{product.name}</Link></h2></div>
       {!hasPrice ? <div className="business-product-card__gate"><b>מחיר עסקי לאחר אישור</b><span>לקוחות מאושרים רואים מחירון ותנאי הזמנה.</span></div> : <div className="business-product-card__price"><span>מחיר לעסק, לפני מע״מ</span><strong>{formatPrice(product.netUnitPrice)}</strong><small>כולל מע״מ ({Math.round(product.vatRate * 100)}%): {formatPrice(product.grossUnitPrice)}</small></div>}
       <p className="business-product-card__terms">מינימום {minimum} יח׳ · בקפיצות של {Math.max(1, product.quantityIncrement)} יח׳</p>
+      <Link className="business-product-card__details" href={productHref}>לפרטים ומפרט <span aria-hidden="true">←</span></Link>
       {manual && <a className="business-product-card__manual" href={manual.href} download>הוראות הפעלה (PDF)</a>}
       {hasPrice && <div className="business-product-card__actions">
         <div className="business-quantity" aria-label={`כמות ${product.name}`}><button type="button" aria-label="הפחתת כמות" onClick={() => changeQuantity(-1)} disabled={quantity <= minimum}>−</button><output>{quantity}</output><button type="button" aria-label="הגדלת כמות" onClick={() => changeQuantity(1)} disabled={quantity >= maximum}>+</button></div>

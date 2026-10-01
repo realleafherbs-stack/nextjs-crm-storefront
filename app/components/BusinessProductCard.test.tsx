@@ -24,6 +24,7 @@ it('confirms a business-cart addition with a direct checkout-cart link', () => {
 it('gives a business customer the matching product manual to download', () => {
   render(<BusinessProductCard product={product} onAdd={vi.fn()} />)
 
+  expect(screen.getByRole('link', { name: 'לפרטים ומפרט' }).getAttribute('href')).toBe('/business/catalog/at-799')
   const manual = screen.getByRole('link', { name: 'הוראות הפעלה (PDF)' })
   expect(manual.getAttribute('href')).toBe('/manuals/htc-at-799-he.pdf')
   expect(manual.hasAttribute('download')).toBe(true)
