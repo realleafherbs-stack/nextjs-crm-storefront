@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { FormEvent, useState } from 'react'
 
 async function requestJson(path: string, method: 'POST' | 'PUT', body: Record<string, unknown>) {
@@ -23,9 +24,9 @@ function FormMessage({ error, success }: { error: string | null; success: string
 }
 
 export function BusinessApplicationForm() {
+  const router = useRouter()
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -34,8 +35,7 @@ export function BusinessApplicationForm() {
     const form = new FormData(formElement)
     try {
       await requestJson('/api/business/apply', 'POST', Object.fromEntries(form))
-      setSuccess('הבקשה התקבלה. נבדוק את פרטי העסק וניצור קשר לאחר אישור החשבון.')
-      formElement.reset()
+      router.replace('/business/application-received')
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'לא ניתן לשלוח את הבקשה')
     } finally { setPending(false) }
@@ -56,7 +56,7 @@ export function BusinessApplicationForm() {
         <label>אתר או אינסטגרם <small>אופציונלי</small><input name="website" type="url" /></label>
       </div>
       <label>הערה <small>אופציונלי</small><textarea name="notes" rows={3} /></label>
-      <FormMessage error={error} success={success} />
+      <FormMessage error={error} success={null} />
       <button className="button button--gold" disabled={pending}>{pending ? 'שולחים…' : 'שליחת בקשה'}</button>
     </form>
   )
