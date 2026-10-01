@@ -4,6 +4,7 @@ export type ProductManual = {
 
 const manualsByHandle: Record<string, ProductManual> = {
   'at-570': { href: '/manuals/htc-at-570-he.pdf' },
+  'at-599': { href: '/manuals/htc-at-599-he.pdf' },
   'at-735': { href: '/manuals/htc-at-735-he.pdf' },
   'at-158': { href: '/manuals/htc-at-158-he.pdf' },
   'at-799': { href: '/manuals/htc-at-799-he.pdf' },
