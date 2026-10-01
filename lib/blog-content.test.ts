@@ -43,3 +43,22 @@ it("lets a CRM article override its built-in version without hiding the rest of 
   expect(merged).toHaveLength(9);
   expect(merged.find((post) => post.slug === override.slug)).toMatchObject({ id: "crm-post", title: "כותרת מעודכנת מה-CRM" });
 });
+
+it("matches each wholesale article to a distinct high-intent business search", async () => {
+  const { fallbackBlogPosts } = await import("./blog-content");
+  const byId = (id: string) => fallbackBlogPosts.find((post) => post.id === id);
+
+  expect(byId("hair-clipper-importer-israel")).toMatchObject({ primaryKeyword: "יבואן מכונות תספורת" });
+  expect(byId("wholesale-clippers-for-barbershops")).toMatchObject({
+    title: expect.stringContaining("מכונות תספורת בסיטונאות"),
+    primaryKeyword: "מכונות תספורת בסיטונאות",
+  });
+  expect(byId("hairdressing-equipment-wholesale-clippers")).toMatchObject({
+    title: expect.stringContaining("סיטונאות למספרות"),
+    primaryKeyword: "סיטונאות למספרות",
+  });
+  expect(byId("hair-clippers-for-retailers-and-distributors")).toMatchObject({
+    title: expect.stringContaining("מכונות תספורת מקצועיות"),
+    primaryKeyword: "מכונות תספורת מקצועיות לספרים",
+  });
+});
