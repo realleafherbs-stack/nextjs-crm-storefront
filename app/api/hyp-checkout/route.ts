@@ -158,7 +158,9 @@ export async function POST(req: NextRequest) {
     // customer pick an installment plan (תשלומים) on the hosted page, which
     // is what polarizedx already sets on this same shared Masof.
     Tash: "1",
-    SuccessUrl: `${siteUrl}/payment/success`,
+    // HYP returns here first so the server can verify its signature and the
+    // staged order total before any CRM order, invoice or receipt is created.
+    SuccessUrl: `${siteUrl}/api/hyp-return`,
     ErrorUrl: `${siteUrl}/payment/failure`,
   });
 

@@ -13,12 +13,13 @@ export default function Footer() {
           <Link href="/shop">לכל הדגמים</Link>
           <Link href="/compare">השוואת דגמים</Link>
           <Link href="/blog">מדריכים מקצועיים</Link>
+          <Link href="/business">הזמנות לעסקים</Link>
         </div>
         <div>
           <h3>המותג</h3>
           <Link href="/#about">HTC בעולם</Link>
           <Link href="/#one-pro">האיכות המקצועית</Link>
-          <Link href="/contact">לשותפים עסקיים</Link>
+          <Link href="/business">לקוחות עסקיים</Link>
         </div>
         <div>
           <h3>שירות</h3>
