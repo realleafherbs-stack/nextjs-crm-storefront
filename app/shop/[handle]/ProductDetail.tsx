@@ -7,6 +7,7 @@ import { useCart } from "../../context/CartContext";
 import { WARRANTY_FAQ_ANSWER, type ProductContent } from "../../../lib/product-content";
 import type { StoreProduct } from "../../../lib/products-data";
 import { FREE_SHIPPING_THRESHOLD, formatPrice, STANDARD_SHIPPING_RATE } from "../../../lib/constants";
+import { getProductManual } from "../../../lib/product-manuals";
 
 const noteIcons = [
   <svg key="0" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 7h6M9 17h6"/></svg>,
@@ -34,6 +35,7 @@ export default function ProductDetail({
   const isFlagship = product.handle === "at-799";
   const stock = product.stock ?? 999;
   const inStock = stock > 0;
+  const manual = getProductManual(product.handle);
 
   useEffect(() => {
     sendGTMEvent({ ecommerce: null });
@@ -157,6 +159,7 @@ export default function ProductDetail({
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
             </button>
           </div>
+          {manual && <a className="product-manual" href={manual.href} download>הוראות הפעלה (PDF)</a>}
           <div className="product-notes" aria-label="יתרונות מרכזיים">
             {content.notes.map((note, index) => (
               <span key={note}>{noteIcons[index] ?? noteIcons[0]}<b>{note}</b></span>
