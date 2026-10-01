@@ -29,9 +29,28 @@ describe('business access journey', () => {
     await user.type(screen.getByLabelText('טלפון'), '0500000000')
     await user.selectOptions(screen.getByLabelText('סוג העסק'), 'BARBER')
     await user.type(screen.getByLabelText('עיר'), 'תל אביב')
+    await user.type(screen.getByLabelText(/ע\.מ\. \/ ח\.פ\./), '515253763')
     await user.click(screen.getByRole('button', { name: 'שליחת בקשה' }))
 
     expect(await screen.findByText(/הבקשה התקבלה/)).not.toBeNull()
+    vi.unstubAllGlobals()
+  })
+
+  it('does not submit an application until a VAT or company number is provided', async () => {
+    const user = userEvent.setup()
+    const fetchMock = vi.fn().mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+    render(<BusinessApplicationForm />)
+
+    await user.type(screen.getByLabelText('שם העסק'), 'מספרת הדוגמה')
+    await user.type(screen.getByLabelText('שם מלא'), 'דנה כהן')
+    await user.type(screen.getByLabelText('אימייל עסקי'), 'owner@example.com')
+    await user.type(screen.getByLabelText('טלפון'), '0500000000')
+    await user.selectOptions(screen.getByLabelText('סוג העסק'), 'BARBER')
+    await user.type(screen.getByLabelText('עיר'), 'תל אביב')
+    await user.click(screen.getByRole('button', { name: 'שליחת בקשה' }))
+
+    expect(fetchMock).not.toHaveBeenCalled()
     vi.unstubAllGlobals()
   })
 
