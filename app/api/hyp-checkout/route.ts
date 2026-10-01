@@ -154,6 +154,10 @@ export async function POST(req: NextRequest) {
     PageLang: "HEB",
     sendemail: "True",
     MoreData: "True",
+    // Forces single-payment only — without this, Hyp defaults to letting the
+    // customer pick an installment plan (תשלומים) on the hosted page, which
+    // is what polarizedx already sets on this same shared Masof.
+    Tash: "1",
     SuccessUrl: `${siteUrl}/payment/success`,
     ErrorUrl: `${siteUrl}/payment/failure`,
   });
