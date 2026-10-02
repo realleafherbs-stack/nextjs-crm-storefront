@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { businessCrm, type BusinessDeliveryInput, type BusinessOrderLine } from '../../../../lib/business-crm'
+import { createHypPaymentPageParams } from '../../../../lib/hyp'
 import { businessPrivateHeaders, businessRouteError, requireCurrentBusinessSession } from '../_shared'
 
 function readText(value: unknown, required = false) {
@@ -38,14 +39,18 @@ async function createHypPaymentUrl(orderId: string, amount: number) {
   const passP = process.env.HYP_PASSP
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
   if (!masof || !key || !passP || !siteUrl) throw new Error('HYP configuration is unavailable')
-  const params = new URLSearchParams({
-    action: 'APISign', What: 'SIGN', Sign: 'True', KEY: key, PassP: passP, Masof: masof,
-    Amount: amount.toFixed(2), Coin: '1', Order: orderId, PageLang: 'HEB', sendemail: 'True', MoreData: 'True',
-    SuccessUrl: new URL('/api/hyp-return', siteUrl).toString(),
-    // Reconcile every signed return server-side, including a gateway failure
-    // response, before showing any customer-facing result.
-    ErrorUrl: new URL('/api/hyp-return', siteUrl).toString(),
-  })
+  const successUrl = new URL('/api/hyp-return', siteUrl).toString()
+  const params = createHypPaymentPageParams(
+    { masof, key, passP },
+    {
+      orderId,
+      amount,
+      successUrl,
+      // Reconcile every signed return server-side, including a gateway failure
+      // response, before showing any customer-facing result.
+      errorUrl: successUrl,
+    },
+  )
   const response = await fetch(`https://pay.hyp.co.il/p/?${params.toString()}`, { cache: 'no-store', signal: AbortSignal.timeout(10_000) })
   const signedParams = await response.text()
   if (!response.ok || (signedParams.includes('CCode=') && !signedParams.includes('action=pay'))) throw new Error('HYP signing failed')

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { stageCheckoutIntent } from "../../../lib/orders";
 import { getProducts } from "../../../lib/products";
 import { calculateShipping, roundCurrency } from "../../../lib/constants";
+import { createHypPaymentPageParams } from "../../../lib/hyp";
 
 export interface CheckoutItem {
   id: string;
@@ -141,26 +142,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not save order. Please try again." }, { status: 502 });
   }
 
-  const params = new URLSearchParams({
-    action: "APISign",
-    What: "SIGN",
-    Sign: "True",
-    KEY: key,
-    PassP: passP,
-    Masof: masof,
-    Amount: String(amount),
-    Coin: "1",
-    Order: orderId,
-    PageLang: "HEB",
-    sendemail: "True",
-    MoreData: "True",
-    // HYP returns here first so the server can verify its signature and the
-    // staged order total before any CRM order, invoice or receipt is created.
-    SuccessUrl: `${siteUrl}/api/hyp-return`,
-    // A payment-page failure can still carry a signed HYP return. Send it
-    // through the same reconciliation endpoint rather than discarding it.
-    ErrorUrl: `${siteUrl}/api/hyp-return`,
-  });
+  const params = createHypPaymentPageParams(
+    { masof, key, passP },
+    {
+      orderId,
+      amount,
+      // HYP returns here first so the server can verify its signature and the
+      // staged order total before any CRM order, invoice or receipt is created.
+      successUrl: `${siteUrl}/api/hyp-return`,
+      // A payment-page failure can still carry a signed HYP return. Send it
+      // through the same reconciliation endpoint rather than discarding it.
+      errorUrl: `${siteUrl}/api/hyp-return`,
+    },
+  );
 
   let signedParams: string;
   try {
