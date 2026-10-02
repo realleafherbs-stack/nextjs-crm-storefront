@@ -9,6 +9,11 @@ function failureResponse(request: NextRequest, { orderId = null, reason = null }
   return NextResponse.redirect(new URL(paymentReturnFailurePath({ orderId, reason }), request.url))
 }
 
+function failureReason(error: unknown): string {
+  if (!(error instanceof HypPaymentError)) return 'UNKNOWN'
+  return error.gatewayCode ? `HYP_VERIFY_${error.gatewayCode}` : error.code
+}
+
 export async function GET(request: NextRequest) {
   const returnParams = request.nextUrl.searchParams
   const orderId = returnParams.get('Order')
@@ -60,7 +65,7 @@ export async function GET(request: NextRequest) {
     console.error('[hyp-return] HYP verification failed:', error instanceof Error ? error.name : error)
     return failureResponse(request, {
       orderId,
-      reason: error instanceof HypPaymentError ? error.code : 'UNKNOWN',
+      reason: failureReason(error),
     })
   }
 }

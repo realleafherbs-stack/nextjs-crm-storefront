@@ -26,7 +26,7 @@ describe('HYP payment verification', () => {
     await expect(verifyHypReturn(
       new URLSearchParams('Order=HT-1&Amount=99&CCode=0&Sign=forged'),
       { orderId: 'HT-1', amount: 99 },
-    )).rejects.toMatchObject({ code: 'INVALID_PAYMENT' })
+    )).rejects.toMatchObject({ code: 'INVALID_PAYMENT', gatewayCode: '902' })
   })
 
   it('rejects a signed transaction when its amount differs from the staged amount', async () => {

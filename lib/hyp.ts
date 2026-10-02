@@ -18,6 +18,7 @@ export class HypPaymentError extends Error {
   constructor(
     public readonly code: 'INVALID_PAYMENT' | 'AMOUNT_MISMATCH' | 'HYP_CONFIGURATION' | 'HYP_UNAVAILABLE',
     message: string,
+    public readonly gatewayCode: string | null = null,
   ) {
     super(message)
     this.name = 'HypPaymentError'
@@ -79,7 +80,7 @@ export async function verifyHypReturn(
   requiredParam(returnParams, 'Sign')
 
   if (redirectCode !== '0' || orderId !== expected.orderId) {
-    throw new HypPaymentError('INVALID_PAYMENT', 'אימות התשלום נכשל')
+    throw new HypPaymentError('INVALID_PAYMENT', 'אימות התשלום נכשל', redirectCode !== '0' ? redirectCode : null)
   }
   if (redirectAmount === null || !sameCurrency(redirectAmount, expected.amount)) {
     throw new HypPaymentError('AMOUNT_MISMATCH', 'סכום התשלום אינו תואם להזמנה')
@@ -108,8 +109,9 @@ export async function verifyHypReturn(
   if (!response.ok) throw new HypPaymentError('HYP_UNAVAILABLE', 'לא ניתן לאמת את התשלום כרגע')
 
   const verified = new URLSearchParams((await response.text()).trim().replace(/^\?/, ''))
-  if (verified.get('CCode') !== '0') {
-    throw new HypPaymentError('INVALID_PAYMENT', 'אימות התשלום נכשל')
+  const verificationCode = verified.get('CCode')
+  if (verificationCode !== '0') {
+    throw new HypPaymentError('INVALID_PAYMENT', 'אימות התשלום נכשל', verificationCode && /^\d+$/.test(verificationCode) ? verificationCode : null)
   }
 
   const verifiedOrder = verified.get('Order')
