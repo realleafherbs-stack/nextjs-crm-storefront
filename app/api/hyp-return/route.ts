@@ -16,6 +16,7 @@ function failureReason(error: unknown): string {
 
 export async function GET(request: NextRequest) {
   const returnParams = request.nextUrl.searchParams
+  const rawReturnQuery = request.nextUrl.search.startsWith('?') ? request.nextUrl.search.slice(1) : ''
   const orderId = returnParams.get('Order')
   if (!orderId) return failureResponse(request)
   const businessOrder = BUSINESS_ORDER_ID_PATTERN.test(orderId)
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
   if (!staged) return failureResponse(request, { orderId, reason: 'MISSING_INTENT' })
 
   try {
-    const verifiedPayment = await verifyHypReturn(returnParams, staged)
+    const verifiedPayment = await verifyHypReturn(returnParams, staged, rawReturnQuery)
     if (businessOrder) {
       await businessCrm.finalizeBusinessOrder(orderId, verifiedPayment)
     } else {
