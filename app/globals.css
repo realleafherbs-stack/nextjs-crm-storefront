@@ -145,6 +145,7 @@ body{font-kerning:normal;background:var(--paper);font-size:1rem}
 .service__copy{padding:clamp(56px,7vw,104px);display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
 .service__copy h2{font-size:clamp(2.25rem,3.7vw,3.6rem);line-height:1.08;max-width:15ch}
 .service__copy>p:not(.kicker){font-size:1rem;line-height:1.8;max-width:34rem}
+.service__actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:22px}.service__actions .button{min-height:52px}
 .service__photo{height:520px}.service__photo img{filter:saturate(.82) contrast(1.05)}
 
 .footer{background:#070706;border-top:1px solid #28251d;padding-top:62px}
