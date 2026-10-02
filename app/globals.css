@@ -3248,7 +3248,7 @@ section[id]{scroll-margin-top:110px}
 /* Product mobile checkout — compact hierarchy with full-size touch targets. */
 @media(max-width:560px){
   .product-template .site-header{
-    height:70px;
+    height:auto;
   }
   .product-template .header__inner{
     min-height:70px;
@@ -4421,7 +4421,7 @@ section[id]{scroll-margin-top:110px}
 }
 
 /* Checkout page (new) */
-.checkout-page{padding:60px 0 100px}
+.checkout-page{min-height:calc(100dvh - 100px);padding:60px 0 100px;background:var(--paper)}
 .checkout-page h1{font-size:clamp(32px,4vw,48px);margin:0 0 32px}
 .checkout-page__grid{display:grid;grid-template-columns:1fr 380px;gap:48px;align-items:start}
 .checkout-page__tabs{display:flex;gap:8px;margin-bottom:20px}
@@ -4607,6 +4607,12 @@ section[id]{scroll-margin-top:110px}
   font-size:12px;
   text-align:center;
 }
+
+/* Checkout validation: reveal the missing field and return the customer to it. */
+.checkout-page__field--invalid label{color:#862018}
+.checkout-page__field--invalid input{border:2px solid #b62e22;background:#fff7f5;box-shadow:0 0 0 3px rgba(182,46,34,.12)}
+.checkout-page__field input{scroll-margin-top:132px}
+.checkout-page__error{font-weight:800;line-height:1.45}
 
 /* Compact cookie consent: visible at the bottom, never an anonymous icon. */
 .cookie-consent__trigger{

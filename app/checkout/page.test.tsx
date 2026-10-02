@@ -54,4 +54,16 @@ describe("CheckoutPage order flow", () => {
     expect(screen.queryByPlaceholderText("קוד קופון")).toBeNull();
     expect(screen.queryByRole("button", { name: "החל" })).toBeNull();
   });
+
+  it("marks and focuses the first missing field before payment", async () => {
+    const user = userEvent.setup();
+    render(<CheckoutPage />);
+
+    await user.click(screen.getByRole("button", { name: "המשך לתשלום" }));
+
+    const firstName = screen.getByLabelText("שם פרטי");
+    expect(screen.getAllByText("שדה חובה")).toHaveLength(8);
+    expect(firstName.getAttribute("aria-invalid")).toBe("true");
+    expect(document.activeElement).toBe(firstName);
+  });
 });
