@@ -109,6 +109,20 @@ export default function Navbar() {
           </button>
         )}
       </div>
+      {!isBusinessArea ? (
+        <Link
+          className="mobile-business-ribbon"
+          href="/business"
+          aria-label="לקוחות עסקיים: מחירי יבואן והזמנה ישירה"
+          onClick={() => setMenuOpen(false)}
+        >
+          <span className="shell mobile-business-ribbon__content">
+            <b>לקוחות עסקיים?</b>
+            <span>מחירי יבואן והזמנה ישירה</span>
+            <i aria-hidden="true">←</i>
+          </span>
+        </Link>
+      ) : null}
     </header>
   );
 }

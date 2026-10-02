@@ -4735,3 +4735,51 @@ section[id]{scroll-margin-top:110px}
 
 /* Business checkout: make a missing required field impossible to overlook. */
 .business-checkout__required{color:#b62e22;font-weight:900}.business-checkout__missing-fields{margin:0 0 18px;padding:13px 15px;border:1px solid #b62e22;border-right:4px solid #b62e22;background:#fff0ed;color:#862018;font-size:14px;font-weight:900;line-height:1.5}.business-checkout__fields label.business-checkout__field--invalid{color:#862018}.business-checkout__fields label.business-checkout__field--invalid input{border:2px solid #b62e22;background:#fff7f5;box-shadow:0 0 0 3px rgba(182,46,34,.12)}.business-checkout__fields label.business-checkout__field--invalid small{font-size:12px;font-weight:900;color:#862018}.business-checkout__fields input{scroll-margin-top:120px}
+
+/* Persistent mobile route for wholesale customers without covering the storefront. */
+.mobile-business-ribbon{display:none}
+@media(max-width:900px){
+  .site-header{height:auto}
+  .site-header .header__inner{height:64px;min-height:64px}
+  .mobile-business-ribbon{
+    position:relative;
+    display:block;
+    min-height:36px;
+    color:#f8f3e8;
+    background:#151512;
+    border-top:1px solid rgba(227,190,65,.28);
+    border-bottom:1px solid rgba(227,190,65,.32);
+    text-decoration:none;
+  }
+  .mobile-business-ribbon__content{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    min-height:34px;
+    padding-inline:42px;
+    font-size:11px;
+    line-height:1;
+    letter-spacing:.01em;
+    direction:rtl;
+  }
+  .mobile-business-ribbon__content b{color:#e3be41;font-weight:900}
+  .mobile-business-ribbon__content span{font-weight:750}
+  .mobile-business-ribbon__content i{
+    position:absolute;
+    inset-inline-start:16px;
+    color:#e3be41;
+    font-size:17px;
+    font-style:normal;
+    line-height:1;
+    transition:transform .2s var(--ease);
+  }
+  .mobile-business-ribbon:hover .mobile-business-ribbon__content i{transform:translateX(-3px)}
+  .mobile-business-ribbon:focus-visible{outline:2px solid #f1cf59;outline-offset:-3px}
+  .site-header .main-nav{top:100px}
+}
+@media(max-width:370px){
+  .mobile-business-ribbon__content{gap:4px;padding-inline:34px;font-size:10px}
+  .mobile-business-ribbon__content i{inset-inline-start:12px}
+}
