@@ -59,8 +59,9 @@ export default function MobileScrollBoundary() {
       const scrollTop = Math.max(window.scrollY, scrollingElement.scrollTop, document.body.scrollTop);
       const viewportHeight = scrollingElement.clientHeight || window.innerHeight;
       const maxScrollTop = Math.max(0, scrollingElement.scrollHeight - viewportHeight);
-      const movingPastTop = scrollTop <= BOUNDARY_EPSILON && touchDeltaY > 0;
-      const movingPastBottom = scrollTop >= maxScrollTop - BOUNDARY_EPSILON && touchDeltaY < 0;
+      const nextScrollTop = scrollTop - touchDeltaY;
+      const movingPastTop = nextScrollTop < -BOUNDARY_EPSILON;
+      const movingPastBottom = nextScrollTop > maxScrollTop + BOUNDARY_EPSILON;
 
       if (
         (movingPastTop || movingPastBottom) &&

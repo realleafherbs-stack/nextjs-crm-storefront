@@ -71,6 +71,17 @@ describe("MobileScrollBoundary", () => {
     expect(pastBottom.defaultPrevented).toBe(true);
   });
 
+  it("blocks a single upward swipe that would cross the document bottom", () => {
+    document.documentElement.scrollTop = 1_195;
+    render(<MobileScrollBoundary />);
+
+    document.body.dispatchEvent(touchEvent("touchstart", 360));
+    const crossingBottom = touchEvent("touchmove", 300);
+    document.body.dispatchEvent(crossingBottom);
+
+    expect(crossingBottom.defaultPrevented).toBe(true);
+  });
+
   it("keeps normal page scrolling and nested scroll areas working", () => {
     render(<MobileScrollBoundary />);
 
