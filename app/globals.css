@@ -3248,7 +3248,7 @@ section[id]{scroll-margin-top:110px}
 /* Product mobile checkout — compact hierarchy with full-size touch targets. */
 @media(max-width:560px){
   .product-template .site-header{
-    height:70px;
+    height:auto;
   }
   .product-template .header__inner{
     min-height:70px;
