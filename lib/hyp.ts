@@ -66,6 +66,7 @@ function readVerifiedAuditField(params: URLSearchParams, key: string): string | 
 export async function verifyHypReturn(
   returnParams: URLSearchParams,
   expected: { orderId: string; amount: number },
+  rawReturnQuery = returnParams.toString(),
 ): Promise<VerifiedHypPayment> {
   const masof = process.env.HYP_MASOF
   const key = process.env.HYP_KEY
@@ -93,13 +94,13 @@ export async function verifyHypReturn(
     KEY: key,
     PassP: passP,
   })
-  // HYP verifies the parameters in the exact redirect order, so do not turn
-  // this into an object or sort it before sending the server-to-server check.
-  for (const [name, value] of returnParams.entries()) verifyParams.append(name, value)
+  // HYP validates the callback parameters byte-for-byte in their original
+  // order. Re-serializing with URLSearchParams changes e.g. `%20` to `+`.
+  const verificationQuery = `${verifyParams.toString()}&${rawReturnQuery}`
 
   let response: Response
   try {
-    response = await fetch(`${HYP_VERIFY_ENDPOINT}?${verifyParams.toString()}`, {
+    response = await fetch(`${HYP_VERIFY_ENDPOINT}?${verificationQuery}`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(10_000),
     })
@@ -129,7 +130,13 @@ export async function verifyHypReturn(
   return {
     orderId: expected.orderId,
     amount: Math.round((expected.amount + Number.EPSILON) * 100) / 100,
-    transactionId: readVerifiedAuditField(returnParams, 'TransID') ?? readVerifiedAuditField(verified, 'TransID'),
-    approvalCode: readVerifiedAuditField(returnParams, 'ApprovalCode') ?? readVerifiedAuditField(verified, 'ApprovalCode'),
+    transactionId: readVerifiedAuditField(returnParams, 'Id')
+      ?? readVerifiedAuditField(verified, 'Id')
+      ?? readVerifiedAuditField(returnParams, 'TransID')
+      ?? readVerifiedAuditField(verified, 'TransID'),
+    approvalCode: readVerifiedAuditField(returnParams, 'ACode')
+      ?? readVerifiedAuditField(verified, 'ACode')
+      ?? readVerifiedAuditField(returnParams, 'ApprovalCode')
+      ?? readVerifiedAuditField(verified, 'ApprovalCode'),
   }
 }

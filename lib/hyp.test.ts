@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { decodePaymentReceipt, encodePaymentReceipt, verifyHypReturn } from './hyp'
 
 const fetchMock = vi.fn()
-const validReturn = new URLSearchParams('Order=HT-1&Amount=99.00&CCode=0&Sign=valid-signature&TransID=transaction-1&ApprovalCode=approval-1')
+const validReturn = new URLSearchParams('Order=HT-1&Amount=99.00&CCode=0&Sign=valid-signature&Id=transaction-1&ACode=approval-1')
 
 describe('HYP payment verification', () => {
   beforeEach(() => {
@@ -46,6 +46,18 @@ describe('HYP payment verification', () => {
     })
     expect(fetchMock).toHaveBeenCalledWith(
       expect.stringContaining('action=APISign&What=VERIFY&Masof=masof-1&KEY=key-1&PassP=pass-1&Order=HT-1&Amount=99.00'),
+      expect.objectContaining({ cache: 'no-store' }),
+    )
+  })
+
+  it('forwards the original callback query without re-encoding its values', async () => {
+    fetchMock.mockResolvedValue(new Response('CCode=0'))
+    const rawReturnQuery = 'Id=transaction-1&CCode=0&Amount=99.00&ACode=approval-1&Order=HT-1&Fild1=Jenny%20Parkington&Fild2=jenny%40example.co.il&Fild3=&Sign=valid-signature'
+
+    await verifyHypReturn(new URLSearchParams(rawReturnQuery), { orderId: 'HT-1', amount: 99 }, rawReturnQuery)
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      expect.stringContaining(`&${rawReturnQuery}`),
       expect.objectContaining({ cache: 'no-store' }),
     )
   })
