@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { decodePaymentReceipt, encodePaymentReceipt, verifyHypReturn } from './hyp'
+import { createHypPaymentPageParams, decodePaymentReceipt, encodePaymentReceipt, verifyHypReturn } from './hyp'
 
 const fetchMock = vi.fn()
 const validReturn = new URLSearchParams('Order=HT-1&Amount=99.00&CCode=0&Sign=valid-signature&Id=transaction-1&ACode=approval-1')
@@ -71,5 +71,18 @@ describe('HYP payment verification', () => {
     expect(decodePaymentReceipt(encodePaymentReceipt({ orderId: 'HTB-1790000000000-a1b2c3d4', amount: 118, channel: 'business' }))).toEqual({
       orderId: 'HTB-1790000000000-a1b2c3d4', amount: 118, channel: 'business',
     })
+  })
+
+  it('creates a minimal UTF-8 payment-page request without unsupported callback fields', () => {
+    const params = createHypPaymentPageParams(
+      { masof: '0010345518', key: 'key-1', passP: 'pass-1' },
+      { orderId: 'HT-1', amount: 99, successUrl: 'https://shop.test/api/hyp-return', errorUrl: 'https://shop.test/api/hyp-return' },
+    )
+
+    expect(params.get('MoreData')).toBeNull()
+    expect(params.get('UTF8')).toBe('True')
+    expect(params.get('UTF8out')).toBe('True')
+    expect(params.get('SuccessUrl')).toBe('https://shop.test/api/hyp-return')
+    expect(params.get('ErrorUrl')).toBe('https://shop.test/api/hyp-return')
   })
 })

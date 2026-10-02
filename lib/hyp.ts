@@ -14,6 +14,38 @@ export type VerifiedPaymentReceipt = {
   channel?: 'business'
 }
 
+export type HypCredentials = {
+  masof: string
+  key: string
+  passP: string
+}
+
+export function createHypPaymentPageParams(
+  { masof, key, passP }: HypCredentials,
+  { orderId, amount, successUrl, errorUrl }: { orderId: string; amount: number; successUrl: string; errorUrl: string },
+): URLSearchParams {
+  return new URLSearchParams({
+    action: 'APISign',
+    What: 'SIGN',
+    Sign: 'True',
+    KEY: key,
+    PassP: passP,
+    Masof: masof,
+    Amount: amount.toFixed(2),
+    Coin: '1',
+    Order: orderId,
+    PageLang: 'HEB',
+    sendemail: 'True',
+    // The callback contains only the documented verification fields. This
+    // avoids receiving terminal-specific optional fields that cannot be
+    // reliably validated by APISign VERIFY.
+    UTF8: 'True',
+    UTF8out: 'True',
+    SuccessUrl: successUrl,
+    ErrorUrl: errorUrl,
+  })
+}
+
 export class HypPaymentError extends Error {
   constructor(
     public readonly code: 'INVALID_PAYMENT' | 'AMOUNT_MISMATCH' | 'HYP_CONFIGURATION' | 'HYP_UNAVAILABLE',
