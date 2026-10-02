@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { sendMetaCapiEvent } from '../../../lib/metaCapi'
 import { businessCrm, BUSINESS_ORDER_ID_PATTERN } from '../../../lib/business-crm'
-import { encodePaymentReceipt, VERIFIED_PAYMENT_RECEIPT_COOKIE, verifyHypReturn } from '../../../lib/hyp'
+import { encodePaymentReceipt, HypPaymentError, VERIFIED_PAYMENT_RECEIPT_COOKIE, verifyHypReturn } from '../../../lib/hyp'
 import { finalizeOrder, getStagedCheckoutIntent } from '../../../lib/orders'
+import { paymentReturnFailurePath } from '../../../lib/payment-return'
 
-function failureResponse(request: NextRequest) {
-  return NextResponse.redirect(new URL('/payment/failure', request.url))
+function failureResponse(request: NextRequest, { orderId = null, reason = null }: { orderId?: string | null; reason?: string | null } = {}) {
+  return NextResponse.redirect(new URL(paymentReturnFailurePath({ orderId, reason }), request.url))
 }
 
 export async function GET(request: NextRequest) {
@@ -17,7 +18,7 @@ export async function GET(request: NextRequest) {
   const staged = businessOrder
     ? await businessCrm.getBusinessPaymentIntent(orderId).catch(() => null)
     : await getStagedCheckoutIntent(orderId)
-  if (!staged) return failureResponse(request)
+  if (!staged) return failureResponse(request, { orderId, reason: 'MISSING_INTENT' })
 
   try {
     const verifiedPayment = await verifyHypReturn(returnParams, staged)
@@ -57,6 +58,9 @@ export async function GET(request: NextRequest) {
     return response
   } catch (error) {
     console.error('[hyp-return] HYP verification failed:', error instanceof Error ? error.name : error)
-    return failureResponse(request)
+    return failureResponse(request, {
+      orderId,
+      reason: error instanceof HypPaymentError ? error.code : 'UNKNOWN',
+    })
   }
 }

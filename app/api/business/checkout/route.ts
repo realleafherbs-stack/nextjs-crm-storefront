@@ -42,7 +42,9 @@ async function createHypPaymentUrl(orderId: string, amount: number) {
     action: 'APISign', What: 'SIGN', Sign: 'True', KEY: key, PassP: passP, Masof: masof,
     Amount: amount.toFixed(2), Coin: '1', Order: orderId, PageLang: 'HEB', sendemail: 'True', MoreData: 'True',
     SuccessUrl: new URL('/api/hyp-return', siteUrl).toString(),
-    ErrorUrl: new URL('/payment/failure', siteUrl).toString(),
+    // Reconcile every signed return server-side, including a gateway failure
+    // response, before showing any customer-facing result.
+    ErrorUrl: new URL('/api/hyp-return', siteUrl).toString(),
   })
   const response = await fetch(`https://pay.hyp.co.il/p/?${params.toString()}`, { cache: 'no-store', signal: AbortSignal.timeout(10_000) })
   const signedParams = await response.text()

@@ -157,7 +157,9 @@ export async function POST(req: NextRequest) {
     // HYP returns here first so the server can verify its signature and the
     // staged order total before any CRM order, invoice or receipt is created.
     SuccessUrl: `${siteUrl}/api/hyp-return`,
-    ErrorUrl: `${siteUrl}/payment/failure`,
+    // A payment-page failure can still carry a signed HYP return. Send it
+    // through the same reconciliation endpoint rather than discarding it.
+    ErrorUrl: `${siteUrl}/api/hyp-return`,
   });
 
   let signedParams: string;
