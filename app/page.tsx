@@ -136,10 +136,13 @@ export default async function HomePage() {
         <section className="service section" id="service">
           <div className="shell service__split">
             <div className="service__copy">
-              <p className="kicker">לספרים ומספרות</p>
+              <p className="kicker">לספרים, מספרות ועסקים</p>
               <h2>עובדים עם HTC</h2>
-              <p>כלים מקצועיים ושירות בישראל.</p>
-              <Link className="button button--gold" href="/contact">דברו איתנו</Link>
+              <p>כלים מקצועיים, מחירי יבואן ושירות בישראל.</p>
+              <div className="service__actions">
+                <Link className="button button--gold" href="/business/apply">פתיחת חשבון עסקי</Link>
+                <Link className="button button--ghost" href="/business/login">כניסה ללקוחות עסקיים</Link>
+              </div>
             </div>
             <div className="service__photo">
               <img src={serviceImage} loading="lazy" decoding="async" alt="עמדת ברברשופ מקצועית עם מגוון מכונות HTC" />

@@ -17,3 +17,8 @@ it("turns the hero product photography into a direct product-page path", () => {
   expect(homePage).toMatch(/const heroProduct = products\.find\(\(p\) => p\.handle === "at-735"\) \?\? featured;/);
   expect(homePage).toMatch(/<Link className="hero__visual" href=\{`\/shop\/\$\{heroProduct\.handle\}`\} aria-label=\{`לצפייה ב־\$\{heroProduct\.name\}`\}\s*\/>/);
 });
+
+it("takes barbers and salons from the service callout into the business account journey", () => {
+  expect(homePage).toContain('href="/business/apply">פתיחת חשבון עסקי</Link>');
+  expect(homePage).toContain('href="/business/login">כניסה ללקוחות עסקיים</Link>');
+});
