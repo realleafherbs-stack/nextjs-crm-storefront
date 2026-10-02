@@ -36,6 +36,16 @@ it("gives business customers a clear direct link to their portal", () => {
   expect(screen.getByRole("link", { name: "לקוחות עסקיים" }).getAttribute("href")).toBe("/business");
 });
 
+it("keeps the business ordering route reachable from the mobile header", () => {
+  render(
+    <CartProvider>
+      <Navbar />
+    </CartProvider>,
+  );
+
+  expect(screen.getByRole("link", { name: "לקוחות עסקיים: מחירי יבואן והזמנה ישירה" }).getAttribute("href")).toBe("/business");
+});
+
 it("shows the separate business cart in the header and keeps its item count in sync", async () => {
   navigationState.pathname = "/business/catalog";
 
