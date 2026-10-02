@@ -10,6 +10,7 @@ function formatPrice(value: number) {
 }
 
 const initialDelivery: BusinessDeliveryInput = { name: '', email: '', phone: '', street: '', houseNumber: '', apartment: '', city: '', notes: '' }
+const requiredDeliveryFields = ['name', 'email', 'phone', 'city', 'street', 'houseNumber'] as const
 
 export function BusinessCheckoutClient({ initialLines, initialCatalog }: { initialLines?: BusinessOrderLine[]; initialCatalog?: BusinessCatalogItem[] }) {
   const cart = useBusinessCart()
@@ -40,14 +41,22 @@ export function BusinessCheckoutClient({ initialLines, initialCatalog }: { initi
   }, [catalog, lines])
   const netTotal = products.reduce((total, { product, quantity }) => total + product.netUnitPrice * quantity, 0)
   const grossTotal = products.reduce((total, { product, quantity }) => total + product.grossUnitPrice * quantity, 0)
-  const valid = Boolean(delivery.name.trim() && delivery.email.trim() && delivery.phone.trim() && delivery.street.trim() && delivery.houseNumber.trim() && delivery.city.trim())
+  const missingFields = requiredDeliveryFields.filter((field) => !delivery[field].trim())
+  const valid = missingFields.length === 0
   const set = (field: keyof BusinessDeliveryInput) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDelivery((current) => ({ ...current, [field]: event.target.value }))
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     setSubmitted(true)
     setError(null)
-    if (!valid || !lines.length) return
+    if (!valid || !lines.length) {
+      const firstMissingField = missingFields[0]
+      if (firstMissingField) {
+        const input = event.currentTarget.elements.namedItem(firstMissingField)
+        if (input instanceof HTMLElement) input.focus()
+      }
+      return
+    }
     setLoading(true)
     try {
       const response = await fetch('/api/business/checkout', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lines, delivery }) })
@@ -69,13 +78,14 @@ export function BusinessCheckoutClient({ initialLines, initialCatalog }: { initi
       </details>
       <form className="business-checkout__form" onSubmit={submit} noValidate>
         <h2>פרטי משלוח</h2><p>המחירון והתנאים ייבדקו שוב בשרת לפני פתיחת התשלום.</p>
+        {submitted && missingFields.length > 0 && <p className="business-checkout__missing-fields" role="alert">יש למלא את השדות המסומנים כדי לעבור לתשלום.</p>}
         <div className="business-checkout__fields">
-          <label>שם מלא<input value={delivery.name} onChange={set('name')} autoComplete="name" />{submitted && !delivery.name.trim() && <small>שדה חובה</small>}</label>
-          <label>אימייל<input type="email" value={delivery.email} onChange={set('email')} autoComplete="email" />{submitted && !delivery.email.trim() && <small>שדה חובה</small>}</label>
-          <label>טלפון<input type="tel" value={delivery.phone} onChange={set('phone')} autoComplete="tel" />{submitted && !delivery.phone.trim() && <small>שדה חובה</small>}</label>
-          <label>עיר<input value={delivery.city} onChange={set('city')} autoComplete="address-level2" />{submitted && !delivery.city.trim() && <small>שדה חובה</small>}</label>
-          <label>רחוב<input value={delivery.street} onChange={set('street')} autoComplete="address-line1" />{submitted && !delivery.street.trim() && <small>שדה חובה</small>}</label>
-          <label>מספר בית<input value={delivery.houseNumber} onChange={set('houseNumber')} autoComplete="address-line2" />{submitted && !delivery.houseNumber.trim() && <small>שדה חובה</small>}</label>
+          <label className={submitted && missingFields.includes('name') ? 'business-checkout__field--invalid' : undefined}>שם מלא <span className="business-checkout__required" aria-hidden="true">*</span><input name="name" value={delivery.name} onChange={set('name')} autoComplete="name" aria-invalid={submitted && missingFields.includes('name')} />{submitted && missingFields.includes('name') && <small>שדה חובה</small>}</label>
+          <label className={submitted && missingFields.includes('email') ? 'business-checkout__field--invalid' : undefined}>אימייל <span className="business-checkout__required" aria-hidden="true">*</span><input name="email" type="email" value={delivery.email} onChange={set('email')} autoComplete="email" aria-invalid={submitted && missingFields.includes('email')} />{submitted && missingFields.includes('email') && <small>שדה חובה</small>}</label>
+          <label className={submitted && missingFields.includes('phone') ? 'business-checkout__field--invalid' : undefined}>טלפון <span className="business-checkout__required" aria-hidden="true">*</span><input name="phone" type="tel" value={delivery.phone} onChange={set('phone')} autoComplete="tel" aria-invalid={submitted && missingFields.includes('phone')} />{submitted && missingFields.includes('phone') && <small>שדה חובה</small>}</label>
+          <label className={submitted && missingFields.includes('city') ? 'business-checkout__field--invalid' : undefined}>עיר <span className="business-checkout__required" aria-hidden="true">*</span><input name="city" value={delivery.city} onChange={set('city')} autoComplete="address-level2" aria-invalid={submitted && missingFields.includes('city')} />{submitted && missingFields.includes('city') && <small>שדה חובה</small>}</label>
+          <label className={submitted && missingFields.includes('street') ? 'business-checkout__field--invalid' : undefined}>רחוב <span className="business-checkout__required" aria-hidden="true">*</span><input name="street" value={delivery.street} onChange={set('street')} autoComplete="address-line1" aria-invalid={submitted && missingFields.includes('street')} />{submitted && missingFields.includes('street') && <small>שדה חובה</small>}</label>
+          <label className={submitted && missingFields.includes('houseNumber') ? 'business-checkout__field--invalid' : undefined}>מספר בית <span className="business-checkout__required" aria-hidden="true">*</span><input name="houseNumber" value={delivery.houseNumber} onChange={set('houseNumber')} autoComplete="address-line2" aria-invalid={submitted && missingFields.includes('houseNumber')} />{submitted && missingFields.includes('houseNumber') && <small>שדה חובה</small>}</label>
           <label>דירה <em>אופציונלי</em><input value={delivery.apartment ?? ''} onChange={set('apartment')} /></label>
           <label className="business-checkout__field--wide">הערה להזמנה <em>אופציונלי</em><textarea rows={3} value={delivery.notes ?? ''} onChange={set('notes')} /></label>
         </div>
