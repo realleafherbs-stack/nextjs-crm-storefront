@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { businessCrm } from '../../../../lib/business-crm'
+import { sanitizeCampaignParams } from '../../../../lib/campaign-attribution'
+import { buildFbc, sendMetaCapiEvent } from '../../../../lib/metaCapi'
 import { businessRouteError } from '../_shared'
 
 const businessTypes = new Set(['SALON', 'BARBER', 'RETAILER', 'DISTRIBUTOR', 'OTHER'])
@@ -24,6 +26,7 @@ export async function POST(request: NextRequest) {
   if (!businessName || !contactName || !email || !phone || !city || !businessIdentifier || !businessType) {
     return NextResponse.json({ error: 'יש למלא את כל פרטי העסק הנדרשים' }, { status: 400 })
   }
+  const attribution = sanitizeCampaignParams(value.attribution)
   try {
     const result = await businessCrm.apply({
       businessName,
@@ -36,8 +39,23 @@ export async function POST(request: NextRequest) {
       website: readString(value.website),
       notes: readString(value.notes),
       source: 'htc-business-site',
+      ...(Object.keys(attribution).length > 0 ? { attribution } : {}),
     })
-    return NextResponse.json({ ok: true, applicationId: result.applicationId })
+    const applicationId = String(result.applicationId)
+    // The saved application is the conversion. sendMetaCapiEvent never throws, and
+    // event_id equals the lead_id the browser pushes so Meta can deduplicate the two.
+    await sendMetaCapiEvent({
+      event: 'CompleteRegistration',
+      eventId: applicationId,
+      email,
+      phone,
+      fbp: request.cookies.get('_fbp')?.value,
+      fbc: request.cookies.get('_fbc')?.value ?? (attribution.fbclid ? buildFbc(attribution.fbclid) : undefined),
+      clientIp: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
+      userAgent: request.headers.get('user-agent') ?? undefined,
+      eventSourceUrl: request.headers.get('referer') ?? undefined,
+    })
+    return NextResponse.json({ ok: true, applicationId })
   } catch (error) {
     return businessRouteError(error)
   }

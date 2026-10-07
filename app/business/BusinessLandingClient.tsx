@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
+import { trackBusinessApplySuccess } from '../../lib/business-analytics'
+import { collectCampaignParams } from '../../lib/campaign-attribution'
 
 async function requestJson(path: string, method: 'POST' | 'PUT', body: Record<string, unknown>) {
   const response = await fetch(path, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
-  const data = await response.json().catch(() => ({})) as { error?: string; ok?: boolean }
+  const data = await response.json().catch(() => ({})) as { error?: string; ok?: boolean; applicationId?: string | number }
   if (!response.ok || data.error) throw new Error(data.error ?? 'לא ניתן להשלים את הפעולה כעת')
   return data
 }
@@ -34,7 +36,10 @@ export function BusinessApplicationForm() {
     const formElement = event.currentTarget
     const form = new FormData(formElement)
     try {
-      await requestJson('/api/business/apply', 'POST', Object.fromEntries(form))
+      const fields = Object.fromEntries(form)
+      const result = await requestJson('/api/business/apply', 'POST', { ...fields, attribution: collectCampaignParams() })
+      // Only reached once the CRM has saved the application (requestJson throws otherwise).
+      if (result.applicationId !== undefined) trackBusinessApplySuccess(String(result.applicationId), String(fields.businessType))
       router.replace('/business/application-received')
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : 'לא ניתן לשלוח את הבקשה')
@@ -105,6 +110,8 @@ export function BusinessResetPasswordForm({ token }: { token: string }) {
 }
 
 export default function BusinessLandingClient() {
+  // Campaign URLs land here; hold the UTM/fbclid values for the apply form.
+  useEffect(() => { collectCampaignParams() }, [])
   return (
     <main className="business-landing">
       <section className="business-landing__hero">
