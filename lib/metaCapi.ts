@@ -37,6 +37,10 @@ export interface MetaCapiEvent {
   clientIp?: string;
   userAgent?: string;
   eventSourceUrl?: string;
+  // Routes the event to Events Manager > Test Events instead of production.
+  // Events sent with it are NOT used for measurement or optimisation, so only
+  // set it on the one event type being verified.
+  testEventCode?: string;
 }
 
 // Sends a server-side event to Meta's Conversions API. Silently no-ops if
@@ -86,7 +90,11 @@ export async function sendMetaCapiEvent(evt: MetaCapiEvent) {
     const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${datasetId}/events`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...payload, access_token: accessToken }),
+      body: JSON.stringify({
+        ...payload,
+        ...(evt.testEventCode ? { test_event_code: evt.testEventCode } : {}),
+        access_token: accessToken,
+      }),
       // The apply route awaits this; a slow Meta must not hang the form response.
       signal: AbortSignal.timeout(5000),
     });

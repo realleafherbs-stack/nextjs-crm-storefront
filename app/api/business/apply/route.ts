@@ -4,6 +4,11 @@ import { sanitizeCampaignParams } from '../../../../lib/campaign-attribution'
 import { buildFbc, sendMetaCapiEvent } from '../../../../lib/metaCapi'
 import { businessRouteError } from '../_shared'
 
+// TEMPORARY: Meta Test Events code for verifying the server CompleteRegistration
+// event. Events sent with it do not count for measurement, so this must be
+// removed as soon as the test is done.
+const TEMP_TEST_EVENT_CODE = 'TEST42509'
+
 const businessTypes = new Set(['SALON', 'BARBER', 'RETAILER', 'DISTRIBUTOR', 'OTHER'])
 
 function readString(value: unknown, required = false): string | undefined {
@@ -54,6 +59,7 @@ export async function POST(request: NextRequest) {
       clientIp: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
       userAgent: request.headers.get('user-agent') ?? undefined,
       eventSourceUrl: request.headers.get('referer') ?? undefined,
+      testEventCode: TEMP_TEST_EVENT_CODE,
     })
     return NextResponse.json({ ok: true, applicationId })
   } catch (error) {
