@@ -36,6 +36,9 @@ export function createHypPaymentPageParams(
     Order: orderId,
     PageLang: 'HEB',
     sendemail: 'True',
+    // Single payment only. Without this the hosted page lets the customer pick
+    // an installment plan (תשלומים); polarizedx sets the same on this Masof.
+    Tash: '1',
     // The callback contains only the documented verification fields. This
     // avoids receiving terminal-specific optional fields that cannot be
     // reliably validated by APISign VERIFY.

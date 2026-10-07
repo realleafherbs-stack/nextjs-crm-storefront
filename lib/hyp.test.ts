@@ -80,6 +80,7 @@ describe('HYP payment verification', () => {
     )
 
     expect(params.get('MoreData')).toBeNull()
+    expect(params.get('Tash')).toBe('1')
     expect(params.get('UTF8')).toBe('True')
     expect(params.get('UTF8out')).toBe('True')
     expect(params.get('SuccessUrl')).toBe('https://shop.test/api/hyp-return')
