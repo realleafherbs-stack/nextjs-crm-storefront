@@ -29,7 +29,24 @@ export async function GET(request: NextRequest) {
   try {
     const verifiedPayment = await verifyHypReturn(returnParams, staged, rawReturnQuery)
     if (businessOrder) {
-      await businessCrm.finalizeBusinessOrder(orderId, verifiedPayment)
+      const finalized = await businessCrm.finalizeBusinessOrder(orderId, verifiedPayment)
+      // Only the call that actually marked the order paid sends it, so a retried return never double-counts.
+      if (finalized.order) {
+        try {
+          await sendMetaCapiEvent({
+            event: 'Purchase',
+            value: finalized.order.total,
+            orderId,
+            contentIds: finalized.order.productIds,
+            email: finalized.order.customerEmail || undefined,
+            phone: finalized.order.customerPhone || undefined,
+            clientIp: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
+            userAgent: request.headers.get('user-agent') ?? undefined,
+          })
+        } catch (error) {
+          console.error('[hyp-return] Meta CAPI business Purchase failed:', error)
+        }
+      }
     } else {
       const finalized = await finalizeOrder(orderId, verifiedPayment)
       if (!finalized) return failureResponse(request)

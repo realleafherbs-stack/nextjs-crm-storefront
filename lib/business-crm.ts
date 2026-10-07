@@ -39,6 +39,8 @@ export type BusinessDeliveryInput = {
 
 export type BusinessOrderLine = { productId: string; quantity: number }
 
+export type BusinessFinalizedOrder = { total: number; productIds: string[]; customerEmail: string; customerPhone: string }
+
 export type BusinessOrderSummary = {
   id: string
   status: 'AWAITING_PAYMENT' | 'PAID' | 'FULFILLED' | 'CANCELLED' | 'PAYMENT_FAILED'
@@ -124,7 +126,8 @@ export class BusinessCrmClient {
   }
 
   finalizeBusinessOrder(orderId: string, verifiedPayment: { orderId: string; amount: number; transactionId: string | null; approvalCode: string | null }) {
-    return this.request<{ ok: true; already: boolean }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'finalize', orderId, verifiedPayment }) })
+    // `order` is present only when this call is the one that marked the order paid.
+    return this.request<{ ok: true; already: boolean; order?: BusinessFinalizedOrder }>('/orders', { method: 'POST', body: JSON.stringify({ action: 'finalize', orderId, verifiedPayment }) })
   }
 
   listBusinessOrders(subject: BusinessSubject) {

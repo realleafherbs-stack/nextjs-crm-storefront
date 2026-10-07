@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { BusinessOrderSummary } from '../../../lib/business-crm'
 import { useBusinessCart } from '../../../lib/business-cart'
+import { trackBusinessPurchase } from '../../../lib/business-analytics'
 
 const statusLabels: Record<BusinessOrderSummary['status'], string> = {
   AWAITING_PAYMENT: 'ממתינה לתשלום', PAID: 'שולמה', FULFILLED: 'נשלחה / הושלמה', CANCELLED: 'בוטלה', PAYMENT_FAILED: 'התשלום נכשל',
@@ -14,7 +15,7 @@ function formatPrice(value: number) {
   return new Intl.NumberFormat('he-IL', { style: 'currency', currency: 'ILS', minimumFractionDigits: 2 }).format(value)
 }
 
-export default function BusinessOrdersClient({ paymentConfirmed = false }: { paymentConfirmed?: boolean }) {
+export default function BusinessOrdersClient({ paymentConfirmed = false, confirmedOrder }: { paymentConfirmed?: boolean; confirmedOrder?: { orderId: string; amount: number } }) {
   const router = useRouter()
   const cart = useBusinessCart()
   const [orders, setOrders] = useState<BusinessOrderSummary[] | null>(null)
@@ -30,6 +31,16 @@ export default function BusinessOrdersClient({ paymentConfirmed = false }: { pay
       .then(({ orders: result }) => setOrders(result))
       .catch((reason) => setError(reason instanceof Error ? reason.message : 'לא ניתן לטעון הזמנות'))
   }, [])
+
+  // Wait for the order list so the push can carry the line items; if it cannot load, still report the sale.
+  const confirmedOrderId = confirmedOrder?.orderId
+  const confirmedAmount = confirmedOrder?.amount
+  useEffect(() => {
+    if (confirmedOrderId === undefined || confirmedAmount === undefined) return
+    if (orders === null && !error) return
+    const match = orders?.find((order) => order.id === confirmedOrderId)
+    trackBusinessPurchase({ orderId: confirmedOrderId, amount: confirmedAmount, items: match?.items ?? [] })
+  }, [confirmedOrderId, confirmedAmount, orders, error])
 
   async function reorder(orderId: string) {
     setReordering(orderId)

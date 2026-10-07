@@ -26,3 +26,39 @@ export function trackBusinessEvent(event: BusinessAnalyticsEvent) {
     // Analytics must never interfere with a protected business workflow.
   }
 }
+
+const PURCHASE_TRACKED_PREFIX = 'htc-business-purchase-tracked-'
+
+export type BusinessPurchaseItem = { productId: string; productName: string; grossUnitPrice: number; quantity: number }
+
+// Fired once per verified business order. The landing URL stays valid for a while,
+// so a reload (or a second tab) must not push the same purchase again.
+export function trackBusinessPurchase({ orderId, amount, items }: { orderId: string; amount: number; items: BusinessPurchaseItem[] }) {
+  try {
+    const key = `${PURCHASE_TRACKED_PREFIX}${orderId}`
+    try {
+      if (window.localStorage.getItem(key)) return
+    } catch {
+      // Storage unavailable: still track rather than lose the conversion.
+    }
+    const dataLayer = ((window as unknown as { dataLayer?: unknown[] }).dataLayer ??= [])
+    dataLayer.push({ ecommerce: null })
+    dataLayer.push({
+      event: 'purchase',
+      customer_type: 'business',
+      ecommerce: {
+        transaction_id: orderId,
+        currency: 'ILS',
+        value: amount,
+        items: items.map((item) => ({ item_id: item.productId, item_name: item.productName, price: item.grossUnitPrice, quantity: item.quantity })),
+      },
+    })
+    try {
+      window.localStorage.setItem(key, '1')
+    } catch {
+      // Best effort only.
+    }
+  } catch {
+    // Analytics must never interfere with the confirmation the customer sees.
+  }
+}
