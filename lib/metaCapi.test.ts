@@ -56,18 +56,6 @@ describe('sendMetaCapiEvent', () => {
     expect(event.custom_data).toMatchObject({ currency: 'ILS', value: 100, order_id: 'order_1', content_ids: ['p1'] })
   })
 
-  it('sends test_event_code at the top level only when one is given', async () => {
-    await sendMetaCapiEvent({ event: 'CompleteRegistration', eventId: 'app_1', testEventCode: 'TEST42509' })
-    const withCode = JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string)
-    expect(withCode.test_event_code).toBe('TEST42509')
-    expect(withCode.data[0].event_id).toBe('app_1')
-
-    vi.mocked(fetch).mockClear()
-    await sendMetaCapiEvent({ event: 'CompleteRegistration', eventId: 'app_2' })
-    const withoutCode = JSON.parse(vi.mocked(fetch).mock.calls[0][1]?.body as string)
-    expect(withoutCode).not.toHaveProperty('test_event_code')
-  })
-
   it('does nothing when Meta credentials are not configured', async () => {
     vi.stubEnv('META_CAPI_ACCESS_TOKEN', '')
     await sendMetaCapiEvent({ event: 'CompleteRegistration', eventId: 'app_1' })

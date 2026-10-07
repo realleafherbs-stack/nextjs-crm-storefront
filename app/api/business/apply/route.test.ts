@@ -79,13 +79,7 @@ describe('POST /api/business/apply', () => {
       clientIp: '1.2.3.4',
       userAgent: 'UA/1',
       eventSourceUrl: 'https://www.htcpro.co.il/business/apply',
-      testEventCode: 'TEST42509',
     })
-  })
-
-  it('sends the temporary Meta test event code with the registration event', async () => {
-    await POST(request(validBody))
-    expect(sendMetaCapiEvent.mock.calls[0][0].testEventCode).toBe('TEST42509')
   })
 
   it('builds fbc from fbclid when the _fbc cookie is missing', async () => {
