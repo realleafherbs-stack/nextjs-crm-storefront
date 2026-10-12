@@ -92,7 +92,7 @@ export default function BusinessProductDetailClient({ handle, catalog: providedC
         <p className="business-product-detail__terms">מינימום {minimum} יח׳ · בקפיצות של {Math.max(1, product.quantityIncrement)} יח׳</p>
         <div className="business-product-detail__actions"><div className="business-quantity" aria-label={`כמות ${product.name}`}><button type="button" aria-label="הפחתת כמות" onClick={() => changeQuantity(-1)} disabled={quantity <= minimum}>−</button><output>{quantity}</output><button type="button" aria-label="הגדלת כמות" onClick={() => changeQuantity(1)} disabled={quantity >= maximum}>+</button></div>{hasPrice && <button className="button button--gold" type="button" disabled={!available} onClick={() => { cart.addLine({ productId: product.productId, quantity }); setFeedback('נוסף לסל העסקי') }}>{available ? 'הוספה להזמנה' : 'לא זמין'}</button>}</div>
         {feedback && <p className="business-product-detail__feedback" role="status"><span>{feedback}</span><Link href="/business/cart">לסל ולתשלום</Link></p>}
-        {manual && <a className="business-product-detail__manual" href={manual.href} download>הוראות הפעלה (PDF)</a>}
+        {manual && <a className="business-product-detail__manual" href={manual.href} download>הוראות שימוש להורדה</a>}
       </div>
     </article>
     <section className="business-product-detail__specs" aria-labelledby="businessSpecsTitle"><div><p className="kicker">מפרט לעסק</p><h2 id="businessSpecsTitle">כל מה שצריך<br />לפני שמזמינים.</h2><p>מפרט ברור לצוות, למדף ולמכירה ללקוח הסופי.</p></div><dl>{content.specs.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>

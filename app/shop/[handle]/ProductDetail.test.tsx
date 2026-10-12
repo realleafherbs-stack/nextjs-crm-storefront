@@ -13,7 +13,7 @@ it('gives a retail customer the matching product manual to download', () => {
   const product = products[0]
   render(<ProductDetail product={product} content={productContent[product.gtin]} related={[]} />)
 
-  const manual = screen.getByRole('link', { name: 'הוראות הפעלה (PDF)' })
+  const manual = screen.getByRole('link', { name: 'הוראות שימוש להורדה' })
   expect(manual.getAttribute('href')).toBe('/manuals/htc-at-799-he.pdf')
   expect(manual.hasAttribute('download')).toBe(true)
 })
