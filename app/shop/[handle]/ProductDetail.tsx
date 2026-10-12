@@ -159,7 +159,7 @@ export default function ProductDetail({
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg>
             </button>
           </div>
-          {manual && <a className="product-manual" href={manual.href} download>הוראות הפעלה (PDF)</a>}
+          {manual && <a className="product-manual" href={manual.href} download>הוראות שימוש להורדה</a>}
           <div className="product-notes" aria-label="יתרונות מרכזיים">
             {content.notes.map((note, index) => (
               <span key={note}>{noteIcons[index] ?? noteIcons[0]}<b>{note}</b></span>
