@@ -4,6 +4,7 @@ import Script from "next/script";
 import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import { CartProvider } from "./context/CartContext";
+import CampaignCapture from "./components/CampaignCapture";
 import IconSprite from "./components/IconSprite";
 import Cart from "./components/Cart";
 import CartToast from "./components/CartToast";
@@ -120,6 +121,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Cart />
           <CartToast />
         </CartProvider>
+        <CampaignCapture />
         <AccessibilityWidget />
         <CookieConsent />
         <WhatsAppButton />

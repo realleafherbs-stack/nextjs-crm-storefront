@@ -33,6 +33,7 @@ export interface OrderPayload {
   coupon?: string;
   customer: OrderCustomer;
   items: OrderItem[];
+  attribution?: Record<string, string>;
 }
 
 async function requestCrm(

@@ -20,7 +20,7 @@ export function buildFbc(fbclid: string, nowMs = Date.now()): string {
 }
 
 export interface MetaCapiEvent {
-  event: "AddToCart" | "Purchase" | "CompleteRegistration";
+  event: "AddToCart" | "Purchase" | "CompleteRegistration" | "InitiateCheckout" | "AddPaymentInfo";
   contentIds?: string[];
   // Omitted for registration-style events, which carry no commerce data.
   value?: number;

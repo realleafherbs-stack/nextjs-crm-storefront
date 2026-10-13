@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useCart } from "../context/CartContext";
 import { calculateShipping, formatPrice } from "../../lib/constants";
+import { trackFunnelEvent } from "../../lib/tracking";
+import { collectCampaignParams } from "../../lib/campaign-attribution";
 
 type Step = "shipping" | "payment";
 
@@ -21,7 +23,8 @@ const requiredFields = [
 ] as const;
 
 export default function CheckoutPage() {
-  const { items, total } = useCart();
+  const { items, total, hydrated } = useCart();
+  const checkoutStarted = useRef(false);
 
   const [step, setStep] = useState<Step>("shipping");
   const [submitted, setSubmitted] = useState(false);
@@ -36,6 +39,19 @@ export default function CheckoutPage() {
     firstName: "", lastName: "", email: "", phone: "",
     street: "", houseNumber: "", apartment: "", city: "", notes: "",
   });
+
+  // begin_checkout: once per visit, after the saved cart has loaded.
+  useEffect(() => {
+    if (!hydrated || items.length === 0 || checkoutStarted.current) return;
+    checkoutStarted.current = true;
+    trackFunnelEvent({
+      ga4Event: "begin_checkout",
+      metaEvent: "InitiateCheckout",
+      value: total,
+      items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hydrated, items.length]);
 
   const set = (key: keyof typeof form) => (value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -59,6 +75,13 @@ export default function CheckoutPage() {
   const handlePay = async () => {
     setLoading(true);
     setError(null);
+    trackFunnelEvent({
+      ga4Event: "add_payment_info",
+      metaEvent: "AddPaymentInfo",
+      value: total,
+      items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity })),
+      contact: { email: form.email.trim(), phone: form.phone.trim() },
+    });
     try {
       const fullAddress = `${form.street} ${form.houseNumber}${form.apartment ? ` דירה ${form.apartment}` : ""}`;
       // No price/amount fields here — /api/hyp-checkout recomputes the
@@ -70,6 +93,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           customer: { ...form, address: fullAddress },
           items: items.map((i) => ({ id: i.id, qty: i.quantity })),
+          attribution: collectCampaignParams(),
         }),
       });
       const data = await res.json();

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { sendGTMEvent } from "@next/third-parties/google";
+import { trackFunnelEvent } from "../../../lib/tracking";
 import { useCart } from "../../context/CartContext";
 import { WARRANTY_FAQ_ANSWER, type ProductContent } from "../../../lib/product-content";
 import type { StoreProduct } from "../../../lib/products-data";
@@ -54,26 +55,12 @@ export default function ProductDetail({
     if (!inStock) return;
     addItem({ id: product.id, name: product.name, price: product.price, image: product.image, stock }, quantity);
 
-    sendGTMEvent({ ecommerce: null });
-    sendGTMEvent({
-      event: "add_to_cart",
-      ecommerce: {
-        currency: "ILS",
-        value: product.price * quantity,
-        items: [{ item_id: product.id, item_name: product.name, price: product.price, quantity }],
-      },
+    trackFunnelEvent({
+      ga4Event: "add_to_cart",
+      metaEvent: "AddToCart",
+      value: product.price * quantity,
+      items: [{ id: product.id, name: product.name, price: product.price, quantity }],
     });
-
-    fetch("/api/meta-capi", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        event: "AddToCart",
-        value: product.price * quantity,
-        contentId: product.id,
-        contentName: product.name,
-      }),
-    }).catch(() => {});
   };
 
   const buyNow = () => {

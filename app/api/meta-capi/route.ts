@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendMetaCapiEvent } from "../../../lib/metaCapi";
 
-const ALLOWED_EVENTS = new Set(["AddToCart", "Purchase"]);
+const ALLOWED_EVENTS = new Set(["AddToCart", "Purchase", "InitiateCheckout", "AddPaymentInfo"]);
 const MAX_STRING_LEN = 200;
 
 function isValidString(v: unknown): v is string {
@@ -35,6 +35,15 @@ export async function POST(req: NextRequest) {
   if (b.orderId !== undefined && !isValidString(b.orderId)) {
     return NextResponse.json({ error: "Invalid orderId" }, { status: 400 });
   }
+  if (b.eventId !== undefined && !isValidString(b.eventId)) {
+    return NextResponse.json({ error: "Invalid eventId" }, { status: 400 });
+  }
+  if (b.email !== undefined && !isValidString(b.email)) {
+    return NextResponse.json({ error: "Invalid email" }, { status: 400 });
+  }
+  if (b.phone !== undefined && !isValidString(b.phone)) {
+    return NextResponse.json({ error: "Invalid phone" }, { status: 400 });
+  }
   if (
     b.contentIds !== undefined &&
     (!Array.isArray(b.contentIds) || b.contentIds.length > 50 || !b.contentIds.every(isValidString))
@@ -45,12 +54,17 @@ export async function POST(req: NextRequest) {
   const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
 
   await sendMetaCapiEvent({
-    event: b.event as "AddToCart" | "Purchase",
+    event: b.event as "AddToCart" | "Purchase" | "InitiateCheckout" | "AddPaymentInfo",
     value: b.value,
     contentId: b.contentId as string | undefined,
     contentIds: b.contentIds as string[] | undefined,
     contentName: b.contentName as string | undefined,
     orderId: b.orderId as string | undefined,
+    eventId: b.eventId as string | undefined,
+    email: b.email as string | undefined,
+    phone: b.phone as string | undefined,
+    fbp: req.cookies.get("_fbp")?.value,
+    fbc: req.cookies.get("_fbc")?.value,
     clientIp,
     userAgent: req.headers.get("user-agent") ?? undefined,
     eventSourceUrl: req.headers.get("referer") ?? undefined,

@@ -3,6 +3,7 @@ import { stageCheckoutIntent } from "../../../lib/orders";
 import { getProducts } from "../../../lib/products";
 import { calculateShipping, roundCurrency } from "../../../lib/constants";
 import { createHypPaymentPageParams } from "../../../lib/hyp";
+import { sanitizeCampaignParams } from "../../../lib/campaign-attribution";
 
 export interface CheckoutItem {
   id: string;
@@ -24,6 +25,7 @@ export interface HypCheckoutBody {
     notes?: string;
   };
   items?: CheckoutItem[];
+  attribution?: unknown;
 }
 
 interface CouponValidation {
@@ -65,6 +67,7 @@ export async function POST(req: NextRequest) {
 
   const body: HypCheckoutBody = await req.json();
   const { coupon, customer, items } = body;
+  const attribution = sanitizeCampaignParams(body.attribution);
 
   if (
     !customer ||
@@ -137,6 +140,7 @@ export async function POST(req: NextRequest) {
     coupon: couponCode,
     customer,
     items: orderItems,
+    ...(Object.keys(attribution).length > 0 ? { attribution } : {}),
   });
   if (!staged) {
     return NextResponse.json({ error: "Could not save order. Please try again." }, { status: 502 });

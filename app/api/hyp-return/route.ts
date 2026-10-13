@@ -40,6 +40,8 @@ export async function GET(request: NextRequest) {
             contentIds: finalized.order.productIds,
             email: finalized.order.customerEmail || undefined,
             phone: finalized.order.customerPhone || undefined,
+            fbp: request.cookies.get('_fbp')?.value,
+            fbc: request.cookies.get('_fbc')?.value,
             clientIp: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
             userAgent: request.headers.get('user-agent') ?? undefined,
           })
@@ -59,6 +61,8 @@ export async function GET(request: NextRequest) {
             contentIds: finalized.order.items.map((item) => item.id),
             email: finalized.order.customerEmail || undefined,
             phone: finalized.order.customerPhone || undefined,
+            fbp: request.cookies.get('_fbp')?.value,
+            fbc: request.cookies.get('_fbc')?.value,
             clientIp: request.headers.get('x-forwarded-for')?.split(',')[0]?.trim(),
             userAgent: request.headers.get('user-agent') ?? undefined,
           })
